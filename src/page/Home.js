@@ -1,40 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { onAuthStateChanged } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { auth } from '../firebase';
+import Button from 'react-bootstrap/Button'
  
-const Home = () => {
+const Home = (props) => {
 
-    const uid = null
-    const [email, setEmail] = useState('')
- 
-    useEffect(()=>{
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-              // User is signed in, see docs for a list of available properties
-              // https://firebase.google.com/docs/reference/js/firebase.User
-              uid = user.uid;
-              setEmail(user.email)
-              // ...
-              console.log("uid", uid)
-            } else {
-              uid = null
-              setEmail(null)
-              // User is signed out
-              // ...
-              console.log("user is logged out")
-            }
-          });
-         
-    }, [])
- 
+  const onLogout = async (e) => {
+    e.preventDefault()
+    signOut(auth)
+        .then(() => {
+            // Sign-out successful.
+        })
+        .catch((error) => {
+            // An error happened.
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.log(errorCode, errorMessage);
+        });
+  }
+
   return (
       <section>        
       <h1> DRCapp </h1>
       <p>
-          User: {email}
+          User: {props.userEmail}
       </p>
-      <div className="App min-vh-100 d-flex justify-content-center align-items-center">
-    </div>
+      <p>
+          UserID: {props.userUid}
+      </p>
+      <Button variant="link" type="submit" onClick={onLogout}>Odhlásit</Button>
     </section>
   )
 }

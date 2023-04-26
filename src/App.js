@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import Home from './page/Home';
 import LoginRegister from './page/LoginRegister';
-import Logout from './page/Logout';
 import { BrowserRouter as Router} from 'react-router-dom';
 import {Routes, Route} from 'react-router-dom';
 import { onAuthStateChanged } from "firebase/auth";
@@ -9,7 +8,7 @@ import { auth } from './firebase';
 
 function App() {
 
-  const uid = null
+  const [uid, setUid] = useState('')
   const [email, setEmail] = useState('')
 
   useEffect(()=>{
@@ -17,12 +16,12 @@ function App() {
           if (user) {
             // User is signed in, see docs for a list of available properties
             // https://firebase.google.com/docs/reference/js/firebase.User
-            uid = user.uid;
+            setUid(user.uid);
             setEmail(user.email)
             // ...
-            console.log("uid", uid)
+            console.log("user is logged in", uid)
           } else {
-            uid = null
+            setUid(null);
             setEmail(null)
             // User is signed out
             // ...
@@ -32,11 +31,18 @@ function App() {
        
   }, [])
 
+  let showPage;
   if (uid) {
-    return (<Home/>)
+    showPage = <Home userUid={uid} userEmail={email}/>;
   } else {
-    return (<LoginRegister/>)
+    showPage = <LoginRegister/>;
   }
+
+  return (
+    <>
+    {showPage}
+    </>
+  )
       
 }
  

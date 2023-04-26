@@ -5,7 +5,7 @@ import { Tabs, Tab } from "react-bootstrap";
 //import { NavLink, useNavigate } from 'react-router-dom'
 import "./LoginRegister.css"
  
-const Login = (setEmail, setPassword, onLogin) => {
+const Login = (props) => {
     return(
         <main className="form-signin">
         <form>
@@ -14,34 +14,34 @@ const Login = (setEmail, setPassword, onLogin) => {
             <input 
                 type="email" 
                 className="form-control" 
-                id="email-address" 
-                name="email"
+                id="signin-email-address" 
+                name="signin-email"
                 required
                 placeholder="name@example.com"
-                onChange={(e)=>setEmail(e.target.value)}/>
+                onChange={(e)=>props.onEmailChange(e.target.value)}/>
             <label htmlFor="email-address">Email</label>
             </div>
             <div className="form-floating">
             <input 
                 type="password" 
                 className="form-control" 
-                id="password"
-                name="password"
+                id="signin-password"
+                name="signin-password"
                 required                                                                                
                 placeholder="Heslo"
-                onChange={(e)=>setPassword(e.target.value)}
+                onChange={(e)=>props.onPasswordChange(e.target.value)}
             />
             <label htmlFor="password">Heslo</label>
             </div>
 
-            <button className="w-100 btn btn-lg btn-primary" type="submit" onClick={onLogin}>Přihlásit</button>
+            <button className="w-100 btn btn-lg btn-primary" type="submit" onClick={props.onLogin}>Přihlásit</button>
             
         </form>
         </main>
     )
 }
 
-const Register = (setEmail, setPassword, onRegister) => {
+const Register = (props) => {
     return(
         <main className="form-signin">
         <form>
@@ -50,27 +50,27 @@ const Register = (setEmail, setPassword, onRegister) => {
             <input 
                 type="email" 
                 className="form-control" 
-                id="email-address" 
-                name="email"
+                id="register-email-address" 
+                name="register-email"
                 required
                 placeholder="name@example.com"
-                onChange={(e)=>setEmail(e.target.value)}/>
+                onChange={(e)=>props.onEmailChange(e.target.value)}/>
             <label htmlFor="email-address">Email</label>
             </div>
             <div className="form-floating">
             <input 
                 type="password" 
                 className="form-control" 
-                id="password"
-                name="password"
+                id="register-password"
+                name="register-password"
                 required                                                                                
                 placeholder="Heslo"
-                onChange={(e)=>setPassword(e.target.value)}
+                onChange={(e)=>props.onPasswordChange(e.target.value)}
             />
             <label htmlFor="password">Heslo</label>
             </div>
 
-            <button className="w-100 btn btn-lg btn-primary" type="submit" onClick={onRegister}>Registrovat</button>
+            <button className="w-100 btn btn-lg btn-primary" type="submit" onClick={props.onRegister}>Registrovat</button>
             
         </form>
         </main>
@@ -122,10 +122,10 @@ const LoginRegister = () => {
         <h1 className="h3 mb-3 fw-normal">DRCapp - Přihlášení</h1>
         <Tabs>
             <Tab eventKey="home" title="Přihlášení">
-                <Login setEmail={setEmail} setPassword={setPassword} onLogin={onLogin} />
+                <Login onEmailChange={setEmail} onPasswordChange={setPassword} onLogin={onLogin} />
             </Tab>
             <Tab eventKey="profile" title="Registrace">
-                <Register setEmail={setEmail} setPassword={setPassword} onRegister={onRegister} />
+                <Register onEmailChange={setEmail} onPasswordChange={setPassword} onRegister={onRegister} />
             </Tab>
         </Tabs>
         </>
