@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { signOut } from "firebase/auth";
-import { auth } from '../firebase';
+import { auth } from '../cred/firebase';
 import Button from 'react-bootstrap/Button'
  
 const Home = (props) => {
