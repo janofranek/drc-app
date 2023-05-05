@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../cred/firebase';
-import { Container, Row, Col, Card, Tabs, Tab, Form, Button } from "react-bootstrap";
+import { Alert, Container, Row, Col, Card, Tabs, Tab, Form, Button, Navbar } from "react-bootstrap";
 import { collection, getDocs } from "firebase/firestore";
 import "./LoginRegister.css"
  
@@ -77,15 +77,6 @@ const Register = (props) => {
                     Registrovat
                 </Button>
             </Form>
-            <div className="todo-content">
-                {
-                    props.users?.map((user,i)=>(
-                        <p key={i}>
-                            {user.email}
-                        </p>
-                    ))
-                }
-            </div>
         </div>
     )
 }
@@ -95,6 +86,7 @@ const LoginRegister = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [users, setUsers] = useState([])
+    const [errorMsg, seterrorMsg] = useState('')
     
     const fetchUsers = async () => {
        
@@ -102,7 +94,7 @@ const LoginRegister = () => {
             .then((querySnapshot)=>{              
                 const newData = querySnapshot.docs
                     .map((doc) => ({...doc.data(), id:doc.id }));
-                setUsers(newData);                
+                setUsers(newData);      
             })
        
     }
@@ -113,61 +105,76 @@ const LoginRegister = () => {
 
     const onLogin = (e) => {
         e.preventDefault();
-        signInWithEmailAndPassword(auth, email, password)
+        const emailLC = email.toLowerCase()
+        signInWithEmailAndPassword(auth, emailLC, password)
         .then((userCredential) => {
-            // Signed in
-            const user = userCredential.user;
-            //navigate("/")
-            console.log(user);
+            seterrorMsg(null)
         })
         .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            console.log(errorCode, errorMessage)
+            seterrorMsg(error.message);
         });
        
     }
 
+    const checkUserInList = (email) => {
+        return users.filter(user => user.email.toLowerCase() === email.toLowerCase()).length > 0
+    }
+
     const onRegister = async (e) => {
         e.preventDefault()
-       
-        await createUserWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-              // Signed in
-              const user = userCredential.user;
-              console.log(user);
-              // ...
-          })
-          .catch((error) => {
-              const errorCode = error.code;
-              const errorMessage = error.message;
-              console.log(errorCode, errorMessage);
-              // ..
-          });
+
+        if (checkUserInList(email)) {
+
+            const emailLC = email.toLowerCase()
+            await createUserWithEmailAndPassword(auth, emailLC, password)
+            .then((userCredential) => {
+                seterrorMsg(null);
+            })
+            .catch((error) => {
+                seterrorMsg(error.message);
+                console.log(error.message)
+            });
+        } else {
+            seterrorMsg("Tento e-mail neznám. Pokud chceš přístup, napiš Janovi");
+            console.log("Tento e-mail neznám. Pokud chceš přístup, napiš Janovi");
+        }
     }
- 
+
     return(
-        <div>
-            <Container fluid>
-                <Row className="vh-100 d-flex justify-content-center align-items-center">
-                    <Col>
-                        <Card className="shadow">
-                            <Card.Body>
-                                <h2 className="fw-bold mb-2 ">DRCapp</h2>
-                                <Tabs fill>
-                                    <Tab eventKey="home" title="Přihlášení">
-                                        <Login onEmailChange={setEmail} onPasswordChange={setPassword} onLogin={onLogin} />
-                                    </Tab>
-                                    <Tab eventKey="profile" title="Registrace">
-                                        <Register onEmailChange={setEmail} onPasswordChange={setPassword} onRegister={onRegister} users={users}/>
-                                    </Tab>
-                                </Tabs>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
+      <div>
+        <Navbar bg="light" variant="light" fixed="top">
+          <Container>
+            <Navbar.Brand>DRCapp</Navbar.Brand>
+            <Navbar.Toggle />
+              <Navbar.Collapse className="justify-content-end">
+                <Navbar.Text>
+                  Nepřihlášen
+                </Navbar.Text>
+              </Navbar.Collapse>
             </Container>
-        </div>
+        </Navbar>
+
+        <Container fluid>
+          <Row className="vh-100 d-flex justify-content-center align-items-center">
+            <Col>
+              <Card className="shadow" style={{ width: '20rem' }}>
+                <Card.Body>
+                  <h2 className="fw-bold mb-2 ">DRCapp</h2>
+                  <Tabs fill>
+                    <Tab eventKey="home" title="Přihlášení">
+                      <Login onEmailChange={setEmail} onPasswordChange={setPassword} onLogin={onLogin} />
+                    </Tab>
+                    <Tab eventKey="profile" title="Registrace">
+                      <Register onEmailChange={setEmail} onPasswordChange={setPassword} onRegister={onRegister}/>
+                    </Tab>
+                  </Tabs>
+                </Card.Body>
+                {errorMsg && <Alert variant="danger" className="v-100"><p>{errorMsg}</p></Alert>}
+              </Card>
+            </Col>
+          </Row>
+        </Container>
+      </div>
     )
 }
  
