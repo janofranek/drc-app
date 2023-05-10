@@ -1,38 +1,45 @@
 import React, {useState, useEffect} from 'react';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from './page/Layout';
 import Home from './page/Home';
 import LoginRegister from './page/LoginRegister';
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from './cred/firebase';
+import Stav from './page/Stav';
+import Admin from './page/Admin';
+import NoPage from './page/NoPage';
+import { AuthProvider } from "./data/AuthProvider"
+import { UsersDataProvider } from "./data/UsersDataProvider"
+import { CoursesDataProvider } from "./data/CoursesDataProvider"
+import { TournamentsDataProvider } from "./data/TournamentsDataProvider"
 
-function App() {
-
-  const [uid, setUid] = useState('')
-  const [email, setEmail] = useState('')
-
-  useEffect(()=>{
-      onAuthStateChanged(auth, (user) => {
-          if (user) { 
-            setUid(user.uid);
-            setEmail(user.email)
-          } else {
-            setUid(null);
-            setEmail(null)
-          }
-        });
-       
-  }, [])
-
-  let showPage;
-  if (uid) {
-    showPage = <Home userUid={uid} userEmail={email}/>;
-  } else {
-    showPage = <LoginRegister/>;
-  }
-
+function AppRouter() {
   return (
     <>
-    {showPage}
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Layout/>}>
+            <Route index element={<Home/>} />
+            <Route path="login" element={<LoginRegister/>} />
+            <Route path="stav" element={<Stav/>} />
+            <Route path="admin" element={<Admin/>} />
+            <Route path="*" element={<NoPage/>} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </>
+  )
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <UsersDataProvider>
+        <CoursesDataProvider>
+          <TournamentsDataProvider>
+            <AppRouter/>
+          </TournamentsDataProvider>
+        </CoursesDataProvider>
+      </UsersDataProvider>
+    </AuthProvider>
   )
       
 }
