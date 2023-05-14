@@ -61,7 +61,7 @@ const Dots = (props) => {
   } else {
     return (
       <>
-        {Array.from({ length: props.shots }).map((value, index) => { return <span className="dot" key={"dot_"+index}></span> })}
+        {Array.from({ length: props.shots }).map((value, index) => { return <><span className="dot" key={"dot_"+index}></span> </> })}
       </>
     )
   }
@@ -72,25 +72,22 @@ const HoleSkore = (props) => {
 
   function handleBlur(e) {
     e.preventDefault();
-    setFormData({
-      ...formData,
-      [e.target.id]: e.target.value,
-    });
-    console.log("Blur")
-    console.log(formData)
-    setHoleScore(props.scorecardId, e.target.id, e.target.value)
-  }
-
-  function handleChange(e) {
-    e.preventDefault();
     let newValue = e.target.value;
     if (newValue.trim() === "") { newValue = "0" }
+    newValue = parseInt(newValue).toString()
     setFormData({
       ...formData,
       [e.target.id]: newValue,
     });
-    console.log("Change")
-    console.log(formData)
+    setHoleScore(props.scorecardId, e.target.id, newValue)
+  }
+
+  function handleChange(e) {
+    e.preventDefault();
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
   }
 
   const handleKeyPress = (e) => {

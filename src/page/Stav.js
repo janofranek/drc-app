@@ -14,18 +14,12 @@ const ResultsTableHeaders = (props) => {
     <>
       <thead>
         <tr key="RHT">
-          <th key="A" rowSpan="2">#</th>
-          <th key="B" rowSpan="2">Hráč</th>
+          <th key="A">#</th>
+          <th key="B" className="leftrow">Hráč</th>
           {props.currTournament.rounds.map((round, index) => {
-            return(<th colSpan="2" key={round.date}>Kolo: {index+1}</th>)
+            return(<th key={round.date}>{index+1}. kolo</th>)
           })}
-          <th key="C" colSpan="2">Celkem</th>
-        </tr>
-        <tr key="RHB">
-          {props.currTournament.rounds.map((round, index) => {
-            return(<><th key={"R"+round.date}>Rány</th ><th key={"S"+round.date}>Stbl</th></>)
-          })}
-          <th key="R">Rány</th><th key="S">Stbl</th>
+          <th key="C">Celkem</th>
         </tr>
       </thead>
     </>
@@ -37,13 +31,13 @@ const ResultsTableRow = (props) => {
     <>
       <tr key={props.counter}>
         <th key="DRI">{props.counter + 1}</th>
-        <td key="DRP">{props.dataRow.player}</td>
+        <td key="DRP" className="leftrow">{props.dataRow.player}</td>
         {props.currTournament.rounds.map((round, index) => {
-            return(<><td key={"R"+round.date}>{props.dataRow[round.date+"_skore"]}</td>
-                    <td key={"S"+round.date}>{props.dataRow[round.date+"_stbl"]}</td></>)
+            return(<><td key={"R"+round.date}>
+              {props.dataRow[round.date+"_skore"]} / {props.dataRow[round.date+"_stbl"]}
+            </td></>)
           })}
-        <th key="DRTR">{props.dataRow.totalSkore}</th>
-        <th key="DRTS">{props.dataRow.totalStbl}</th>
+        <th key="DRTR">{props.dataRow.totalSkore} / {props.dataRow.totalStbl}</th>
       </tr>
     </>
   )
