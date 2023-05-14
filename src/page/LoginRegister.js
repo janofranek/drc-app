@@ -98,7 +98,6 @@ const LoginRegister = () => {
     if (authEmail) {
         return <Navigate to="/" />;
     }
-    
       
     const onLogin = (e) => {
         e.preventDefault();
