@@ -101,8 +101,53 @@ th, td {
   text-align: center;
 }
 
+.scorecell {
+  background-color: lightblue;
+}
+
 .scoretable {
   border: thin solid lightgrey;
   border-collapse: collapse;
   table-layout: fixed;
+}
+
+.scoretablefirstcol {
+  width: 45px;
+}
+
+.scoretablecol {
+  width: 31px;
+}
+
+.acctable {
+  table-layout: fixed;
+}
+
+.acctablecolname {
+  width: 250px;
+  text-align: left;
+}
+
+.acctablecolscore {
+  width: 100px;
+  text-align: right;
+}
+
+.flighttable {
+  table-layout: fixed;
+  padding: 10px;
+  border: thin solid lightgrey;
+  border-collapse: collapse;
+}
+
+.flighttablecol {
+  width: 100px;
+}
+
+.flightscoreinput {
+  border: thin solid lightgrey;
+  outline: none;
+  width: 60px;
+  text-align: center;
+  font-size: 1.1em;
 }

@@ -1,14 +1,13 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Navigate  } from "react-router-dom";
-import { db } from '../cred/firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { Table, Button, Container, Tabs, Tab } from "react-bootstrap";
+import { Table, Button, Container, Tabs, Tab, Form, Accordion } from "react-bootstrap";
 import "./Common.css"
 import { useUsers } from '../data/UsersDataProvider';
 import { useAuth } from '../data/AuthProvider';
 import { useCourses } from '../data/CoursesDataProvider';
 import { useTournaments } from '../data/TournamentsDataProvider';
-import { getPlayingHCP, getHoleShots } from "./Utils.js"
+import { SkoreFlightAccHeader, SkoreFlightAccBody } from "./ScorecardFlight.js"
+import { getScorecardId, createNewScorecard, resetScorecard } from "./Utils.js"
 
 
 const UsersTable = () => {
@@ -42,61 +41,124 @@ const UsersTable = () => {
   )
 }
 
+const AdminSkorky = () => {
+
+    const [scorecardId, setScorecardId] = useState('');
+    const [teeColor, setTeeColor] = useState('yellow');
+
+    //load data
+    const users = useUsers();
+    const courses = useCourses();
+    const tournaments = useTournaments();
+  
+    //while data not loaded, show Loading...
+    if (!users || !courses || !tournaments) return "Loading..."
+  
+    const currTournament = tournaments.filter(tournament => tournament.active === "1")[0];
+    const currRound = currTournament.rounds.filter(round => round.active === "1")[0];
+    const currCourse = courses.filter(course => course.id === currRound.course)[0];
+
+    const onInitSkorky = async (e) => {
+      e.preventDefault();
+  
+      //loop over players
+      currTournament.players.forEach(async playerId => {
+        const initScorecardId = getScorecardId( currRound.date, playerId );
+        const playerUser = users.filter(user => user.id === playerId)[0];
+        await createNewScorecard(initScorecardId, playerUser, currCourse)
+      });
+    }
+
+    const onResetSkorky = async (e) => {
+      e.preventDefault();
+  
+      //loop over players
+      currTournament.players.forEach(async playerId => {
+        const resetScorecardId = getScorecardId( currRound.date, playerId );
+        const playerUser = users.filter(user => user.id === playerId)[0];
+        await resetScorecard(resetScorecardId, playerUser, currCourse)
+      });
+    }
+
+    const onResetJednaSkorka = async (e) => {
+      e.preventDefault();
+      const playerId = scorecardId.substring(11)
+      const playerUser = users.filter(user => user.id === playerId)[0];
+      await resetScorecard(scorecardId, playerUser, currCourse, teeColor)
+    }
+
+    return (
+      <>
+        <Form className="form-signin">
+          <Button variant="primary" type="submit" onClick={onInitSkorky}>Init skorky</Button>
+          <Button variant="primary" type="submit" onClick={onResetSkorky}>Reset skorky</Button>
+          <Form.Group className="mb-3">
+            <Form.Label>ScorecardId</Form.Label>
+            <Form.Control 
+              className="form-control"
+              type="text" 
+              placeholder="ScorecardId" 
+              id="scorecardid"
+              name="scorecardid" 
+              required 
+              onChange={(e)=>setScorecardId(e.target.value)}/>
+            <Form.Label>Tee</Form.Label>
+            <Form.Select
+              type="text" 
+              id="teeColor"
+              name="teeColor" 
+              required 
+              defaultvalue="yellow"
+              onChange={(e)=>setTeeColor(e.target.value)}
+            >
+              <option value="yellow">Žlutá</option>
+              <option value="white">Bílá</option>
+            </Form.Select>
+            <Button variant="primary" type="submit" onClick={onResetJednaSkorka}>Reset jedna skorka</Button>
+           </Form.Group>
+        </Form>
+      </>
+    )
+}
+
+const AktualKolo = () => {
+
+  //load data
+  const tournaments = useTournaments();
+
+  //while data not loaded, show Loading...
+  if (!tournaments) return "Loading..."
+
+  const currTournament = tournaments.filter(tournament => tournament.active === "1")[0];
+  const currRound = currTournament.rounds.filter(round => round.active === "1")[0];
+
+  return (
+    <>
+      <Accordion>
+        {currTournament.players.map((player, index) => { 
+          return(
+            <>
+              <Accordion.Item eventKey={index} key={index} >
+                <SkoreFlightAccHeader player={player} currentRound={currRound}/>
+                <SkoreFlightAccBody player={player} currentRound={currRound}/> 
+              </Accordion.Item>
+            </>
+          )
+        })}
+      </Accordion>
+    </>
+  )
+}
 
 const Admin = () => {
 
   //load data
   const authEmail = useAuth();
-  const users = useUsers();
-  const courses = useCourses();
-  const tournaments = useTournaments();
 
   // If not logged in, redirect to login page
   if (!authEmail) {
     return <Navigate to="/login" />;
   }
-
-  //while data not loaded, show Loading...
-  if (!users || !courses || !tournaments) return "Loading..."
-
-  const onInitSkorky = async (e) => {
-    e.preventDefault();
-
-    const currTournament = tournaments.filter(tournament => tournament.active === "1")[0];
-    const currRound = currTournament.rounds.filter(round => round.active === "1")[0];
-    const currCourse = courses.filter(course => course.id === currRound.course)[0];
-
-    //loop over players
-    currTournament.players.forEach(async player => {
-      const scorecardId = currRound.date + " " + player;
-      const docSnap = await getDoc(doc(db,'scorecards',scorecardId));
-      //insert only if the scorecard does not already exist
-      if (!docSnap.exists()) {
-        const playerUser = users.filter(user => user.id === player)[0];
-        const playingHCP = getPlayingHCP(playerUser, currCourse);
-        const newScorecard = { "course": currCourse.id,
-            "player": player,
-            "tee": playerUser.tee,
-            "playingHCP": playingHCP,
-            "holes": [] }
-        currCourse.holes.forEach(hole => {
-          newScorecard.holes.push(
-            {
-              "hole": hole.hole,
-              "par": hole.par,
-              "shots": getHoleShots( hole.index, playingHCP ),
-              "score": 0,
-              "stableford": 0
-            }
-          )
-        })
-        await setDoc(doc(db,'scorecards',scorecardId), newScorecard);
-      }
-      
-    });
-    
-  }
-
 
   return (
     <div>
@@ -105,8 +167,11 @@ const Admin = () => {
           <Tab eventKey="users" title="users">
             <UsersTable />
           </Tab>
-          <Tab eventKey="initSkorky" title="initSkorky">
-            <Button variant="primary" type="submit" onClick={onInitSkorky}>Init skorky</Button>
+          <Tab eventKey="adminSkorky" title="adminSkorky">
+            <AdminSkorky />
+          </Tab>
+          <Tab eventKey="aktualKolo" title="aktualKolo">
+            <AktualKolo />
           </Tab>
         </Tabs>
       </Container>

@@ -10,6 +10,7 @@ import { AuthProvider } from "./data/AuthProvider"
 import { UsersDataProvider } from "./data/UsersDataProvider"
 import { CoursesDataProvider } from "./data/CoursesDataProvider"
 import { TournamentsDataProvider } from "./data/TournamentsDataProvider"
+import { ScorecardsDataProvider } from "./data/ScorecardsDataProvider"
 
 function AppRouter() {
   return (
@@ -35,7 +36,9 @@ function App() {
       <UsersDataProvider>
         <CoursesDataProvider>
           <TournamentsDataProvider>
-            <AppRouter/>
+            <ScorecardsDataProvider>
+              <AppRouter/>
+            </ScorecardsDataProvider>
           </TournamentsDataProvider>
         </CoursesDataProvider>
       </UsersDataProvider>

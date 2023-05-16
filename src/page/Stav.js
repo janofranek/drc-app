@@ -1,13 +1,12 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import { Navigate  } from "react-router-dom";
-import { db } from '../cred/firebase';
-import { collection, onSnapshot } from "firebase/firestore";
-import { Table, ButtonGroup, ToggleButton, Alert } from "react-bootstrap";
+import { Table, ButtonGroup, ToggleButton } from "react-bootstrap";
 import "./Common.css"
 import { useAuth } from '../data/AuthProvider';
 import { useUsers } from '../data/UsersDataProvider';
 import { useTournaments } from '../data/TournamentsDataProvider';
-import { getRoundSkore } from "./Utils.js"
+import { useScorecards } from '../data/ScorecardsDataProvider';
+import { getRoundSkore, getTeamRoundSkore } from "./Utils.js"
 
 const ResultsTableHeaders = (props) => {
   return (
@@ -26,6 +25,23 @@ const ResultsTableHeaders = (props) => {
   )
 }
 
+const TeamResultsTableHeaders = (props) => {
+  return (
+    <>
+      <thead>
+        <tr key="RHT">
+          <th key="A">#</th>
+          <th key="B" colspan="2" className="leftrow">Tým</th>
+          {props.currTournament.rounds.map((round, index) => {
+            return(<th key={round.date}>{index+1}. kolo</th>)
+          })}
+          <th key="C">Celkem</th>
+        </tr>
+      </thead>
+    </>
+  )
+}
+
 const ResultsTableRow = (props) => {
   return (
     <>
@@ -33,7 +49,7 @@ const ResultsTableRow = (props) => {
         <th key="DRI">{props.counter + 1}</th>
         <td key="DRP" className="leftrow">{props.dataRow.player}</td>
         {props.currTournament.rounds.map((round, index) => {
-            return(<><td key={"R"+round.date}>
+            return(<><td key={"R"+round.date+props.counter}>
               {props.dataRow[round.date+"_skore"]} / {props.dataRow[round.date+"_stbl"]}
             </td></>)
           })}
@@ -55,17 +71,49 @@ const ResultsTableRows = (props) => {
   )
 }
 
+const getTeamMembers = (team) => {
+  let members = team.players.toString();
+  return members.replace(",", " / ").replace(",", " / ")
+}
 
-const StavJednotlivci = (props) => { 
+const TeamResultsTableRow = (props) => {
+  return (
+    <>
+      <tr key={props.counter}>
+        <th key="DRI">{props.counter + 1}</th>
+        <td key="DRT" className="leftrow">{props.dataRow.team.name}</td>
+        <td key="DRP" className="leftrow">{getTeamMembers(props.dataRow.team)}</td>
+        {props.currTournament.rounds.map((round, index) => {
+            return(<><td key={"R"+round.date+props.counter}>
+              {props.dataRow[round.date+"_stbl"]}
+            </td></>)
+          })}
+        <th key="DRTR">{props.dataRow.totalStbl}</th>
+      </tr>
+    </>
+  )
+}
 
+const TeamResultsTableRows = (props) => {
+  return (
+    <>
+      <tbody>
+        {props.teamTableData.map( (row, index) => {
+          return ( <TeamResultsTableRow counter={index} dataRow={row} currTournament={props.currTournament}/> )
+        })}
+      </tbody>
+    </>
+  )
+}
+
+const getResultsDataTable = (currTournament, scorecards) => {
   let resultsTableData = [];
-  const currTournament = props.tournaments.filter(tournament => tournament.active === "1")[0];
 
   currTournament.players.forEach( (player) => {
     let rowData = { "player": player }
     let totalSkore = 0, totalStbl = 0
     currTournament.rounds.forEach( (round) => {
-      const [roundSkore, roundStbl] = getRoundSkore( player, round.date, props.scorecards )
+      const [roundSkore, roundStbl] = getRoundSkore( player, round.date, scorecards )
       rowData[round.date+"_skore"] = roundSkore
       rowData[round.date+"_stbl"] = roundStbl
       totalSkore = totalSkore + roundSkore
@@ -76,6 +124,12 @@ const StavJednotlivci = (props) => {
     resultsTableData.push(rowData);
   });
 
+  return resultsTableData
+}
+
+const StavJednotlivci = (props) => { 
+  const currTournament = props.tournaments.filter(tournament => tournament.active === "1")[0];
+  let resultsTableData = getResultsDataTable(currTournament, props.scorecards);
   resultsTableData.sort((a, b) => b.totalStbl - a.totalStbl)
 
   return (
@@ -86,53 +140,49 @@ const StavJednotlivci = (props) => {
       </Table>
     </>
   )
-
 }
 
 const StavTymy = (props) => {
+  const currTournament = props.tournaments.filter(tournament => tournament.active === "1")[0];
+  let resultsTableData = getResultsDataTable(currTournament, props.scorecards);
+  let teamTableData = [];
+  currTournament.teams.forEach(team => {
+    let rowData = { "team": team }
+    let totalStbl = 0
+    currTournament.rounds.forEach( (round) => {
+      const roundStbl = getTeamRoundSkore( team, round.date, resultsTableData )
+      rowData[round.date+"_stbl"] = roundStbl
+      totalStbl = totalStbl + roundStbl
+    });
+    rowData.totalStbl = totalStbl
+    teamTableData.push(rowData);
+  });
+  teamTableData.sort((a, b) => b.totalStbl - a.totalStbl)
 
+  return (
+    <>
+      <Table striped bordered hover size="sm">
+        <TeamResultsTableHeaders currTournament={currTournament}/>
+        <TeamResultsTableRows currTournament={currTournament} teamTableData={teamTableData}/>
+      </Table>
+    </>
+  )
 }
 
 
 const Stav = () => {
 
   const [radioValue, setRadioValue] = useState('1');
-  const [scorecards, setScorecards] = useState(null);
-  const [errorMsg, seterrorMsg] = useState(null);
 
   //load data
   const authEmail = useAuth();
   const users = useUsers();
   const tournaments = useTournaments();
-
-  //subscribe scorecards
-  useEffect(()=>{
-    const unsub = onSnapshot(collection(db, 'scorecards'),
-      (snapshot) => {
-        const newData = [];
-        snapshot.forEach((doc) => {
-          newData.push({...doc.data(), id:doc.id })
-        });
-        setScorecards(newData);
-        seterrorMsg(null)
-      },
-      (error) => {
-        seterrorMsg("Nepovedlo se načíst skórkarty")
-        console.log("Nepovedlo se načíst skórkarty")
-      });
-    return () => { 
-      unsub();
-      setScorecards(null) 
-    };
-  }, [])
+  const scorecards = useScorecards();
 
   // If not logged in, redirect to login page
   if (!authEmail) {
     return <Navigate to="/login" />;
-  }
-
-  if(errorMsg) {
-    return (<Alert variant="danger" className="v-100"><p>{errorMsg}</p></Alert>)
   }
 
   if(!scorecards || !users || !tournaments) {
