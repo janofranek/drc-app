@@ -43,7 +43,7 @@ export const SkoreFlightAccHeader = (props) => {
     const scorecardId = getScorecardId(props.currentRound.date, props.player)
     return (
       <Accordion.Body> 
-        <ScorecardPlayer scorecardId={scorecardId}/>
+        <ScorecardPlayer scorecardId={scorecardId} readOnly={props.readOnly}/>
       </Accordion.Body>
     )
   }
@@ -81,10 +81,15 @@ export const SkoreFlightAccHeader = (props) => {
       }
     };
   
+    const handleFocus = (e) => {
+      e.preventDefault();
+      e.target.setSelectionRange(0, e.target.value.length)
+    }
+  
     return (
       <td>
         <label for={"skore" + props.data.short}>{props.data.short}</label><br/>
-        <input type="number" 
+        <input type="tel" 
           className = "flightscoreinput"
           id={props.data.scorecardId + "/" + props.holeSelect} 
           name={props.data.scorecardId + "/" + props.holeSelect}
@@ -96,6 +101,7 @@ export const SkoreFlightAccHeader = (props) => {
           onBlur={handleBlur}
           onChange={handleChange}
           onKeyPress={handleKeyPress}
+          onFocus={handleFocus}
           required
           // value={props.data.scorecard.holes[props.holeSelect-1].score}
           value={props.formData[props.data.scorecardId + "/" + props.holeSelect] ?? props.data.scorecard.holes[props.holeSelect-1].score}
@@ -159,7 +165,7 @@ export const SkoreFlightAccHeader = (props) => {
               </td>
               <td>
                 <label for="holeSelect" className="thick">Jamka</label><br/>
-                <input type="number" 
+                <input type="tel" 
                   className = "flightscoreinput thick"
                   id="holeSelect" 
                   name="holeSelect"

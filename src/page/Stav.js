@@ -1,12 +1,13 @@
 import React, {useState} from 'react';
 import { Navigate  } from "react-router-dom";
-import { Table, ButtonGroup, ToggleButton } from "react-bootstrap";
+import { Table, ButtonGroup, ToggleButton, Modal, Button } from "react-bootstrap";
 import "./Common.css"
 import { useAuth } from '../data/AuthProvider';
 import { useUsers } from '../data/UsersDataProvider';
 import { useTournaments } from '../data/TournamentsDataProvider';
 import { useScorecards } from '../data/ScorecardsDataProvider';
-import { getRoundSkore, getTeamRoundSkore } from "./Utils.js"
+import { ScorecardPlayer } from "./ScorecardPlayer.js"
+import { getScorecardId, getRoundSkore, getTeamRoundSkore } from "./Utils.js"
 
 const ResultsTableHeaders = (props) => {
   return (
@@ -42,19 +43,54 @@ const TeamResultsTableHeaders = (props) => {
   )
 }
 
+const ScorecardModal = (props) => {
+  if (!props.scorecardId) {
+    return (<></>)
+  }
+
+  return (
+    <Modal show={props.showScorecard} onHide={props.handleClose} dialogClassName="scoremodal">
+        <Modal.Header closeButton>
+          <Modal.Title>{props.scorecardId}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <ScorecardPlayer scorecardId={props.scorecardId} readOnly={true}/>
+        </Modal.Body>
+      </Modal>
+  )
+}
+
 const ResultsTableRow = (props) => {
+  const [showScorecard, setShowscorecard] = useState(false);
+  const [scorecardId, setScorecardId] = useState(null);
+
+  const handleClose = (e) => {
+    setScorecardId(null)
+    setShowscorecard(false);
+  }
+  
+  const handleShow = (e) => {
+    console.log("handleShow")
+    console.log(e.target.id)
+    setScorecardId(e.target.id)
+    setShowscorecard(true);
+  }
+
   return (
     <>
       <tr key={props.counter}>
-        <th key="DRI">{props.counter + 1}</th>
-        <td key="DRP" className="leftrow">{props.dataRow.player}</td>
+        <th key="DRI" className="vertcenter">{props.counter + 1}</th>
+        <td key="DRP" className="leftrow vertcenter">{props.dataRow.player}</td>
         {props.currTournament.rounds.map((round, index) => {
             return(<><td key={"R"+round.date+props.counter}>
-              {props.dataRow[round.date+"_skore"]} / {props.dataRow[round.date+"_stbl"]}
+              <Button variant='link' type='submit' onClick={handleShow} id={getScorecardId(round.date, props.dataRow.player)} key={getScorecardId(round.date, props.dataRow.player)}>
+                {props.dataRow[round.date+"_skore"]}/{props.dataRow[round.date+"_stbl"]}
+              </Button>
             </td></>)
           })}
-        <th key="DRTR">{props.dataRow.totalSkore} / {props.dataRow.totalStbl}</th>
+        <th key="DRTR" className="vertcenter">{props.dataRow.totalSkore}/{props.dataRow.totalStbl}</th>
       </tr>
+      <ScorecardModal showScorecard={showScorecard} scorecardId={scorecardId} handleClose={handleClose}/>
     </>
   )
 }

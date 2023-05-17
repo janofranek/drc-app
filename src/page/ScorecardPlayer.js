@@ -78,6 +78,7 @@ export const InfoPlayer = (props) => {
     const [formData, setFormData] = useState({});
   
     function handleBlur(e) {
+      if (props.readOnly) {return}
       e.preventDefault();
       let newValue = e.target.value;
       if (newValue.trim() === "") { newValue = "0" }
@@ -90,6 +91,7 @@ export const InfoPlayer = (props) => {
     }
   
     function handleChange(e) {
+      if (props.readOnly) {return}
       e.preventDefault();
       setFormData({
         ...formData,
@@ -98,6 +100,7 @@ export const InfoPlayer = (props) => {
     }
   
     const handleKeyPress = (e) => {
+      if (props.readOnly) {return}
       const charCode = e.charCode;
       const inputChar = String.fromCharCode(charCode);
   
@@ -108,6 +111,7 @@ export const InfoPlayer = (props) => {
     };
   
     const handleFocus = (e) => {
+      if (props.readOnly) {return}
       e.preventDefault();
       e.target.setSelectionRange(0, e.target.value.length)
     }
@@ -123,7 +127,7 @@ export const InfoPlayer = (props) => {
           <td className="leftrow scorecell">Skóre</td>
           {props.nineHoles.map((hole) => { 
             return <td className="centerrow scorecell" key={"hole_score_"+hole.hole}>
-              <input type="text" 
+              <input type="tel" 
                 id={hole.hole}
                 key={"hole_input_"+hole.hole}
                 pattern="\d{1,2}"
@@ -155,7 +159,7 @@ export const InfoPlayer = (props) => {
       <>
         <HoleNumbers nine={props.nine} nineHoles={nineHoles}/>
         <tbody>
-          <HoleSkore nine={props.nine} nineHoles={nineHoles} scorecardId={props.scorecard.id}/>
+          <HoleSkore nine={props.nine} nineHoles={nineHoles} scorecardId={props.scorecard.id} readOnly={props.readOnly}/>
         </tbody>
       </>
     )
@@ -167,6 +171,10 @@ export const InfoPlayer = (props) => {
     if(!scorecards) {
       return ("Loading...")
     }
+
+    if (scorecards.filter(s => s.id === props.scorecardId).length === 0) {
+      return ("Skorka neexistuje")
+    }
   
     const scorecard = scorecards.filter(s => s.id === props.scorecardId)[0];
   
@@ -177,8 +185,8 @@ export const InfoPlayer = (props) => {
             <col className="scoretablefirstcol" />
             <col span = "10" className="scoretablecol" />
           </colgroup>
-          <ScorecardNine nine={1} scorecard={scorecard}/>
-          <ScorecardNine nine={2} scorecard={scorecard}/>
+          <ScorecardNine nine={1} scorecard={scorecard} readOnly={props.readOnly}/>
+          <ScorecardNine nine={2} scorecard={scorecard} readOnly={props.readOnly}/>
         </table>
       </>
     )
