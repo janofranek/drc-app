@@ -8,6 +8,7 @@ import { useCourses } from '../data/CoursesDataProvider';
 import { useTournaments } from '../data/TournamentsDataProvider';
 import { SkoreFlightAccHeader, SkoreFlightAccBody } from "./ScorecardFlight.js"
 import { getScorecardId, createNewScorecard, resetScorecard } from "./Utils.js"
+import NoActiveTournament from "./NoActiveTournament"
 
 
 const UsersTable = () => {
@@ -54,13 +55,26 @@ const AdminSkorky = () => {
     //while data not loaded, show Loading...
     if (!users || !courses || !tournaments) return "Loading..."
   
+    //if there is no active tournament or round, just show basic info
+    if (tournaments.filter(tournament => tournament.active === "1").length === 0) {
+      return <NoActiveTournament />
+    }
+    if (tournaments.filter(tournament => tournament.active === "1")[0].rounds.filter(round => round.active === "1").length === 0) {
+      return <NoActiveTournament />
+    }
+
+
     const currTournament = tournaments.filter(tournament => tournament.active === "1")[0];
     const currRound = currTournament.rounds.filter(round => round.active === "1")[0];
     const currCourse = courses.filter(course => course.id === currRound.course)[0];
 
+    console.log(currRound)
+
     const onInitSkorky = async (e) => {
       e.preventDefault();
-  
+
+      console.log(currRound.date)
+
       //loop over players
       currTournament.players.forEach(async playerId => {
         const initScorecardId = getScorecardId( currRound.date, playerId );
@@ -129,6 +143,15 @@ const AktualKolo = () => {
   //while data not loaded, show Loading...
   if (!tournaments) return "Loading..."
 
+  //if there is no active tournament or round, just show basic info
+  if (tournaments.filter(tournament => tournament.active === "1").length === 0) {
+    return <NoActiveTournament />
+  }
+  if (tournaments.filter(tournament => tournament.active === "1")[0].rounds.filter(round => round.active === "1").length === 0) {
+    return <NoActiveTournament />
+  }
+
+  
   const currTournament = tournaments.filter(tournament => tournament.active === "1")[0];
   const currRound = currTournament.rounds.filter(round => round.active === "1")[0];
 

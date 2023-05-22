@@ -8,6 +8,7 @@ import { useCourses } from '../data/CoursesDataProvider';
 import { useTournaments } from '../data/TournamentsDataProvider';
 import { InfoPlayer, ScorecardPlayer } from "./ScorecardPlayer.js"
 import { SkoreFlightTable, SkoreFlightAccHeader, SkoreFlightAccBody } from "./ScorecardFlight.js"
+import NoActiveTournament from "./NoActiveTournament"
 import { getScorecardId, getFlight } from "./Utils.js"
 
 const SkorePlayer = (props) => {
@@ -66,6 +67,15 @@ const Home = () => {
   ];
 
   const currentUser = users.filter(user => user.email.toLowerCase() === authEmail.toLowerCase())[0]
+
+  //if there is no active tournament or round, just show basic info
+  if (tournaments.filter(tournament => tournament.active === "1").length === 0) {
+    return <NoActiveTournament />
+  }
+  if (tournaments.filter(tournament => tournament.active === "1")[0].rounds.filter(round => round.active === "1").length === 0) {
+    return <NoActiveTournament />
+  }
+
   const currentRound = tournaments.filter(tournament => tournament.active === "1")[0].rounds.filter(round => round.active === "1")[0]
   const scorecardId = getScorecardId(currentRound.date, currentUser.id)
 

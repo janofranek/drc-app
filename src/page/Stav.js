@@ -7,6 +7,7 @@ import { useUsers } from '../data/UsersDataProvider';
 import { useTournaments } from '../data/TournamentsDataProvider';
 import { useScorecards } from '../data/ScorecardsDataProvider';
 import { ScorecardPlayer } from "./ScorecardPlayer.js"
+import NoActiveTournament from "./NoActiveTournament"
 import { getScorecardId, getRoundSkore, getTeamRoundSkore } from "./Utils.js"
 
 const ResultsTableHeaders = (props) => {
@@ -224,6 +225,16 @@ const Stav = () => {
   if(!scorecards || !users || !tournaments) {
     return ("Loading...")
   }
+
+  //if there is no active tournament or round, just show basic info
+  if (tournaments.filter(tournament => tournament.active === "1").length === 0) {
+    return <NoActiveTournament />
+  }
+  if (tournaments.filter(tournament => tournament.active === "1")[0].rounds.filter(round => round.active === "1").length === 0) {
+    return <NoActiveTournament />
+  }
+
+  
 
   const radios = [
     { name: 'Jednotlivci', value: '1' },
