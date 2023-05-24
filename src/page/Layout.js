@@ -54,13 +54,13 @@ const Layout = () => {
       <Container fluid>
         <Navbar bg="dark" variant="dark" fixed="top">
           <Container>
-          <Navbar.Brand>DRCapp</Navbar.Brand>
+          <Navbar.Brand as={Link} to="/">DRCapp</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse className="justify-content-end">
             <Nav className="justify-content-end">
               {authEmail &&
                   <>
-                  <Nav.Link as={Link} to="/">Skóre</Nav.Link>
+                  <Nav.Link as={Link} to="/skore">Skóre</Nav.Link>
                   <Nav.Link as={Link} to="/stav">Stav</Nav.Link>
                   </>
               }

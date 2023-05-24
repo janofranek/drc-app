@@ -164,3 +164,21 @@ th, td {
   width: auto;
   min-width: 400px; 
 }
+
+.centeralign {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+}
+
+.drctable {
+  border: none;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.drcimage {
+  border: none;
+}
+
