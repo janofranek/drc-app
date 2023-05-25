@@ -2,6 +2,8 @@ import React from 'react';
 import { Navigate, Link } from "react-router-dom";
 import "./Common.css"
 import { useAuth } from '../data/AuthProvider';
+import logoStt from "../assets/DRCstandard.png"
+import logoLat from "../assets/DRClatin.png"
 
 const Home = () => {
 
@@ -23,8 +25,8 @@ const Home = () => {
         </thead>
         <tbody>
           <tr>
-            <td className="drcimage"><img src="/DRCstandard.svg" alt="DRC logo standard" width="150" height="150" /></td>
-            <td className="drcimage"><img src="/DRClatin.svg" alt="DRC logo latin" width="150" height="150" /></td>
+            <td className="drcimage"><img src={logoStt} alt="DRC logo standard" /></td>
+            <td className="drcimage"><img src={logoLat} alt="DRC logo latin" /></td>
           </tr>
           <tr>
             <td colSpan={2}><div className="centeralign"><Link to="/history"> Minulé turnaje </Link></div></td>
