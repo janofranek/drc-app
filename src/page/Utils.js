@@ -131,5 +131,106 @@ const getFlight = (currentUser, currentRound) => {
     return currentRound.flights.filter(flight => flight.players.includes(currentUser.id))[0]?.players
 }
 
-export { getScorecardId, getPlayingHCP, getHolesHCP, getHoleShots, setHoleScore, 
-    getRoundSkore, getTeamRoundSkore, getFlight, createNewScorecard, resetScorecard }
+const getRyderHoleClass = (score) => {
+    const holeClass = "ryder-score-match";
+    const scoreMap = new Map([
+        [-1, " stt-final"],
+        [0, " square-final"],
+        [1, " lat-final"]
+    ]);
+  
+    return holeClass + ( scoreMap.get(score) ?? "" );
+}
+
+const getRyderMatchScore = (match) => {
+    return match.holes.reduce((a, v) => a += v, 0);
+}
+
+const getRyderMatchClass = (match, small = false) => {
+    const score = getRyderMatchScore(match);
+    let matchClass = "ryder-score-total";
+    matchClass += (small ? "-small" : "")
+    if ( score < 0 ) {
+        matchClass += " stt-";
+    } else if ( score > 0 ) {
+        matchClass += " lat-";
+    } else {
+        matchClass += " square-";
+    }
+    matchClass += (match.final ? "final" : "prelim")
+    return matchClass;
+}
+
+const getRyderMatchText = (match) => {
+    const score = getRyderMatchScore(match);
+    if (match.final) {
+        return match.result
+    } else if (score) {
+        return Math.abs(score) + " up"
+    } else {
+        return "0"
+    }
+}
+
+const getRyderHoleScore = (buttonId) =>{
+    const buttonMap = new Map([
+        ["stt", -1],
+        ["rem", 0],
+        ["lat", 1],
+        ["neh", null],
+    ]);
+    return buttonMap.get(buttonId)
+}
+
+const setMatchScore = async (matchId, holeNumber, newScore, totalHolesCount) => {
+    const matchRef = doc(db, "matches", matchId);
+    const matchSnap = await getDoc(matchRef);
+    let updateData = {};
+    let newHoles = [...matchSnap.data().holes]
+    if ( newScore === null ) {
+        newHoles[holeNumber-1] = null;
+    } else {
+        newHoles[holeNumber-1] = Number(newScore);
+    }
+    updateData["holes"] = newHoles;
+    // detect, if the match is finished
+    const matchScore = newHoles.reduce((a, v) => a += (v ?? 0), 0);
+    const holesToPlay = totalHolesCount - newHoles.filter(h => !(h == null) ).length;
+    // last hole
+    if ( holesToPlay === 0 ) {
+        updateData["final"] = true;
+        updateData["finalScore"] = Math.sign(matchScore);
+        updateData["result"] = ( matchScore === 0 ? "square" : Math.abs(matchScore).toString() + " up")
+    // score is higher than number of holes to play
+    } else if ( Math.abs(matchScore) > holesToPlay) {
+        updateData["final"] = true;
+        updateData["finalScore"] = Math.sign(matchScore);
+        updateData["result"] = Math.abs(matchScore).toString() + "&" + holesToPlay.toString();
+    // if the match was finished, but after score change it is not
+    } else if ( matchSnap.data().final && holesToPlay > 0 &&  Math.abs(matchScore) <= holesToPlay) {
+        updateData["final"] = false;
+        updateData["finalScore"] = 0;
+        updateData["result"] = "";
+    }
+    await updateDoc(matchRef, updateData);
+}
+
+const formatRyderStatus = (score) => {
+    const halfSymbol = "\u00bd";
+    const tolerance = 0.01;
+    const wholePart = Math.floor(score);
+    const hasHalf = ( Math.abs(score - wholePart - 0.5) < tolerance );
+    if (wholePart === 0 && hasHalf) {
+        return halfSymbol;
+    } else if (hasHalf) {
+        return wholePart.toString() + " " + halfSymbol;
+    } else {
+        return wholePart.toString();
+    }
+
+}
+
+
+export { getScorecardId, getPlayingHCP, getHolesHCP, getHoleShots, setHoleScore,
+    getRoundSkore, getTeamRoundSkore, getFlight, createNewScorecard, resetScorecard, getRyderHoleClass,
+    getRyderHoleScore, getRyderMatchClass, getRyderMatchText, setMatchScore, formatRyderStatus }

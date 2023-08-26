@@ -8,10 +8,11 @@ import { useCourses } from '../data/CoursesDataProvider';
 import { useTournaments } from '../data/TournamentsDataProvider';
 import { InfoPlayer, ScorecardPlayer } from "./ScorecardPlayer.js"
 import { SkoreFlightTable, SkoreFlightAccHeader, SkoreFlightAccBody } from "./ScorecardFlight.js"
+import { ScorecardRyderMatch } from "./ScorecardRyderMatch.js"
 import NoActiveTournament from "./NoActiveTournament"
 import { getScorecardId, getFlight } from "./Utils.js"
 
-const SkorePlayer = (props) => {
+const ScorePlayer = (props) => {
 
   return (
     <>
@@ -21,7 +22,7 @@ const SkorePlayer = (props) => {
   )
 }
 
-const SkoreFlight = (props) => {
+const ScoreFlight = (props) => {
 
   const currentFlight = getFlight(props.currentUser, props.currentRound)
 
@@ -42,42 +43,34 @@ const SkoreFlight = (props) => {
       </Accordion>
     </>
   )
-  }
-  
-const Score = () => {
+}
+
+const ScoreTournamentUnknown = (props) => {
+  return (
+    <>
+      <p>Nepodporovaný systém turnaje - {props.tournamentId} - {props.tournamentSystem}</p>
+    </>
+  )
+}
+
+const ScoreTournamentRyderCup = (props) => {
+
+  return (
+    <>
+      <ScorecardRyderMatch currTournament={props.currTournament} currentRound={props.currentRound} currentUser={props.currentUser} />
+    </>
+  )
+}
+
+const ScoreTournamentStableford = (props) => {
   const [radioValue, setRadioValue] = useState('1');
 
-  //load data
-  const authEmail = useAuth();
-  const users = useUsers();
-  const courses = useCourses();
-  const tournaments = useTournaments();
-
-  //if not logged in, redirect to login page
-  if (!authEmail) {
-    return <Navigate to="/login" />;
-  }
-
-  //while data not loaded, show Loading...
-  if (!users || !courses || !tournaments) return "Loading..."
-  
   const radios = [
     { name: 'Jen já', value: '1' },
     { name: 'Celý flight', value: '2' }
   ];
 
-  const currentUser = users.filter(user => user.email.toLowerCase() === authEmail.toLowerCase())[0]
-
-  //if there is no active tournament or round, just show basic info
-  if (tournaments.filter(tournament => tournament.active === "1").length === 0) {
-    return <NoActiveTournament />
-  }
-  if (tournaments.filter(tournament => tournament.active === "1")[0].rounds.filter(round => round.active === "1").length === 0) {
-    return <NoActiveTournament />
-  }
-
-  const currentRound = tournaments.filter(tournament => tournament.active === "1")[0].rounds.filter(round => round.active === "1")[0]
-  const scorecardId = getScorecardId(currentRound.date, currentUser.id)
+  const scorecardId = getScorecardId(props.currentRound.date, props.currentUser.id)
 
   return (
     <div>
@@ -99,9 +92,62 @@ const Score = () => {
         ))}
       </ButtonGroup>
 
-      {(radioValue==="1" ? <SkorePlayer scorecardId={scorecardId}/> : <SkoreFlight currentUser={currentUser} currentRound={currentRound}/>)}
+      {(radioValue==="1" ? <ScorePlayer scorecardId={scorecardId}/> : <ScoreFlight currentUser={props.currentUser} currentRound={props.currentRound}/>)}
     </div>
   )
+
+}
+
+const Score = () => {
+
+  //load data
+  const authEmail = useAuth();
+  const users = useUsers();
+  const courses = useCourses();
+  const tournaments = useTournaments();
+
+  //if not logged in, redirect to login page
+  if (!authEmail) {
+    return <Navigate to="/login" />;
+  }
+
+  //while data not loaded, show Loading...
+  if (!users || !courses || !tournaments) return "Loading..."
+  
+  const currentUser = users.filter(user => user.email.toLowerCase() === authEmail.toLowerCase())[0]
+
+  //if there is no active tournament or round, just show basic info
+  if (tournaments.filter(tournament => tournament.active === "1").length === 0) {
+    return <NoActiveTournament />
+  }
+  if (tournaments.filter(tournament => tournament.active === "1")[0].rounds.filter(round => round.active === "1").length === 0) {
+    return <NoActiveTournament />
+  }
+
+  const currTournament = tournaments.filter(tournament => tournament.active === "1")[0]
+  const tournamentSystem = currTournament.system;
+  const tournamentId = currTournament.id;
+  const currentRound = currTournament.rounds.filter(round => round.active === "1")[0]
+
+  if (tournamentSystem === "stableford") {
+    return(<ScoreTournamentStableford 
+              tournamentId={tournamentId} 
+              currentRound={currentRound} 
+              currentUser={currentUser}
+            />)
+  } else if (tournamentSystem === "rydercup") {
+    return(<ScoreTournamentRyderCup 
+              currTournament={currTournament} 
+              currentRound={currentRound} 
+              currentUser={currentUser}
+              readOnly={false}
+            />)
+  } else {
+    return(<ScoreTournamentUnknown 
+              tournamentId={tournamentId} 
+              tournamentSystem={tournamentSystem} 
+            />)
+  }
 }
 
 export default Score

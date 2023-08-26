@@ -8,11 +8,12 @@ import Stav from './page/Stav';
 import History from './page/History';
 import Admin from './page/Admin';
 import NoPage from './page/NoPage';
-import { AuthProvider } from "./data/AuthProvider"
-import { UsersDataProvider } from "./data/UsersDataProvider"
-import { CoursesDataProvider } from "./data/CoursesDataProvider"
-import { TournamentsDataProvider } from "./data/TournamentsDataProvider"
-import { ScorecardsDataProvider } from "./data/ScorecardsDataProvider"
+import { AuthProvider } from "./data/AuthProvider";
+import { UsersDataProvider } from "./data/UsersDataProvider";
+import { CoursesDataProvider } from "./data/CoursesDataProvider";
+import { TournamentsDataProvider } from "./data/TournamentsDataProvider";
+import { ScorecardsDataProvider } from "./data/ScorecardsDataProvider";
+import { MatchesDataProvider } from './data/MatchesDataProvider';
 
 function AppRouter() {
   return (
@@ -41,7 +42,9 @@ function App() {
         <CoursesDataProvider>
           <TournamentsDataProvider>
             <ScorecardsDataProvider>
-              <AppRouter/>
+              <MatchesDataProvider>
+                <AppRouter/>
+              </MatchesDataProvider>
             </ScorecardsDataProvider>
           </TournamentsDataProvider>
         </CoursesDataProvider>
