@@ -5,6 +5,7 @@ import { Outlet, Link } from "react-router-dom";
 import { Container, Navbar, Nav, Button, Alert } from "react-bootstrap";
 import { useUsers } from '../data/UsersDataProvider';
 import { useAuth } from '../data/AuthProvider';
+import { checkUserAdmin } from "./Utils"
 
 const NavText = (props) => {
   if (props.userEmail) {
@@ -28,7 +29,7 @@ const Layout = () => {
   const users = useUsers();
   const authEmail = useAuth();
 
-  if (!users) return "Loading...";
+  if (!users) return "Loading ... Layout ... waiting for users";
 
   const onLogout = async (e) => {
     e.preventDefault()
@@ -41,16 +42,8 @@ const Layout = () => {
       });
   }
 
-  const checkUserAdmin = () => {
-      if (!authEmail || !users) {
-          return false
-      } else {
-          return users.filter(user => user.email.toLowerCase() === authEmail.toLowerCase() && user.admin).length > 0
-      }
-  }
-
   return (
-      <>
+    <>
       <Container fluid>
         <Navbar bg="dark" variant="dark" fixed="top">
           <Container>
@@ -64,7 +57,7 @@ const Layout = () => {
                   <Nav.Link as={Link} to="/stav">Stav</Nav.Link>
                   </>
               }
-              {checkUserAdmin() && <Nav.Link as={Link} to="/admin">Admin</Nav.Link>}
+              {checkUserAdmin(authEmail, users) && <Nav.Link as={Link} to="/admin">Admin</Nav.Link>}
             </Nav>
             <Navbar.Text>
               <NavText userEmail={authEmail} onLogout={onLogout}/>
@@ -75,7 +68,7 @@ const Layout = () => {
         {errorMsg && <Alert variant="danger" className="v-100"><p>{errorMsg}</p></Alert>}
         <Outlet />
       </Container>  
-      </>
+    </>
   )
 }
 

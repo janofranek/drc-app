@@ -15,6 +15,7 @@ export const CoursesDataProvider = ({ children }) => {
                 .map((doc) => ({...doc.data(), id:doc.id }));
             setCourses(newData);      
         })
+        .catch(error => console.log("Nepovedlo se načíst hřiště: " + error.message))
   }
 
   useEffect( () => {

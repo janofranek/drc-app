@@ -1,6 +1,13 @@
 import { db } from '../cred/firebase';
 import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 
+const checkUserAdmin = (authEmail, users) => {
+    if (!authEmail || !users) {
+        return false
+    } else {
+        return users.filter(user => user.email.toLowerCase() === authEmail.toLowerCase() && user.admin).length > 0
+    }
+}
 const  getScorecardId = (date, playerId) => {
     return date + " " + playerId;
 }
@@ -199,17 +206,17 @@ const setMatchScore = async (matchId, holeNumber, newScore, totalHolesCount) => 
     // last hole
     if ( holesToPlay === 0 ) {
         updateData["final"] = true;
-        updateData["finalScore"] = Math.sign(matchScore);
+        updateData["final_score"] = Math.sign(matchScore);
         updateData["result"] = ( matchScore === 0 ? "square" : Math.abs(matchScore).toString() + " up")
     // score is higher than number of holes to play
     } else if ( Math.abs(matchScore) > holesToPlay) {
         updateData["final"] = true;
-        updateData["finalScore"] = Math.sign(matchScore);
+        updateData["final_score"] = Math.sign(matchScore);
         updateData["result"] = Math.abs(matchScore).toString() + "&" + holesToPlay.toString();
     // if the match was finished, but after score change it is not
     } else if ( matchSnap.data().final && holesToPlay > 0 &&  Math.abs(matchScore) <= holesToPlay) {
         updateData["final"] = false;
-        updateData["finalScore"] = 0;
+        updateData["final_score"] = 0;
         updateData["result"] = "";
     }
     await updateDoc(matchRef, updateData);
@@ -230,7 +237,39 @@ const formatRyderStatus = (score) => {
 
 }
 
+const getRyderStandings = (allMatches, date = null) => {
+    const matches = allMatches.filter( m => ( date == null || m.id.substring(0,10) === date))
 
-export { getScorecardId, getPlayingHCP, getHolesHCP, getHoleShots, setHoleScore,
+    const sttFinal = matches
+        .filter( m => m.final && m.final_score <= 0 )
+        .reduce((a ,v) =>  a = a + ( v.final_score < 0 ? 1.0 : 0.5 ) , 0.0)
+    const latFinal = matches
+        .filter( m => m.final && m.final_score >= 0 )
+        .reduce((a ,v) =>  a = a + ( v.final_score > 0 ? 1.0 : 0.5 ) , 0.0)
+    const liveMatches = matches.filter( m => !m.final && m.holes.length > 0 && m.holes.some((h) => h!==null))
+    let sttPrelim = sttFinal;
+    let latPrelim = latFinal;
+    for (const m of liveMatches) {
+        const liveScore = m.holes.reduce((a, v) => a += (v ?? 0), 0)
+        if ( liveScore < 0 ) {
+            sttPrelim += 1.0;
+        } else if ( liveScore > 0 ) {
+            latPrelim += 1.0;
+        } else {
+            sttPrelim += 0.5;
+            latPrelim += 0.5;
+        }
+    }
+
+    return {
+        "sttFinal": sttFinal,
+        "latFinal": latFinal,
+        "sttPrelim": sttPrelim,
+        "latPrelim": latPrelim
+    }
+}
+
+export { getScorecardId, getPlayingHCP, getHolesHCP, getHoleShots, setHoleScore, getRyderStandings,
     getRoundSkore, getTeamRoundSkore, getFlight, createNewScorecard, resetScorecard, getRyderHoleClass,
-    getRyderHoleScore, getRyderMatchClass, getRyderMatchText, setMatchScore, formatRyderStatus }
+    getRyderHoleScore, getRyderMatchClass, getRyderMatchText, setMatchScore, formatRyderStatus,
+    checkUserAdmin }

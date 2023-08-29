@@ -15,6 +15,7 @@ export const TournamentsDataProvider = ({ children }) => {
                 .map((doc) => ({...doc.data(), id:doc.id }));
             setTournaments(newData);      
         })
+        .catch(error => console.log("Nepovedlo se načíst turnaje: " + error.message))
   }
 
   useEffect( () => {

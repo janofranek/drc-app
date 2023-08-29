@@ -92,7 +92,7 @@ const LoginRegister = () => {
     const authEmail = useAuth();
     const users = useUsers();
 
-    if (!users) return "Loading...";
+    if (!users) return "Loading ... LoginRegister page ... waiting for users";
 
     // If already logged in, redirect to login page
     if (authEmail) {

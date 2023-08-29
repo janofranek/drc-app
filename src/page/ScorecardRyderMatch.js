@@ -26,19 +26,23 @@ const InfoMatch = (props) => {
     </>
   )
 }
-  
+
+const getHoleNr = (nine, i) => {return nine * 9 - 8 + i}
+
 const HoleNumbers = (props) => {
-  const getHoleNr = (i) => {return props.nine * 9 - 8 + i}
   return (
     <>
       <thead key={"hole_numbers_"+props.nine}><tr>
         <th className="centerrow" key={"hole_hash_"+props.nine}>#</th>
-        {Array.from(Array(9).keys()).map((index) => { return <th className="centerrow" key={"hole_nr_" + getHoleNr(index)}>{getHoleNr(index)}</th> })}
+        {Array.from(Array(9).keys()).map((index) => { 
+          return ( <th className="centerrow" key={"hole_nr_" + getHoleNr(props.nine, index)}>
+            {getHoleNr(props.nine, index)}
+          </th> 
+        )})}
       </tr></thead>
     </>
   )
 }
-  
 
 const HoleRyderMatchScore = (props) => {
   const [localNine, setLocalNine] = useState([]);
@@ -55,7 +59,7 @@ const HoleRyderMatchScore = (props) => {
   
   const onDivClick = (e) => {
     e.preventDefault();
-    const holeNr = props.nine * 9 - 8 + Number(e.target.id)
+    const holeNr = getHoleNr( props.nine, Number(e.target.id))
     // allow score cancellation only on last played hole
     props.setDisabledNehrano(!(props.match.holes[holeNr] == null))
     let fire = false;
@@ -82,8 +86,8 @@ const HoleRyderMatchScore = (props) => {
       <tr>
         <td></td>
         {localNine.map((hole, index) => { 
-          return <td key={"hole_score_"+index} className="centerrow">
-            <div key={"hole_cell_" + index}
+          return <td key={"hole_score_"+getHoleNr(props.nine, index)} className="centerrow">
+            <div key={"hole_cell_" + getHoleNr(props.nine, index)}
               id={index}
               className={getRyderHoleClass(hole)} 
               onClick={onDivClick}
@@ -117,23 +121,11 @@ const ScorecardRyderMatchNine = (props) => {
   )
 }
   
-export const ScorecardRyderMatch = (props) => {
+export const ScorecardRyderMatchId = (props) => {
   const [showModal, setShowModal] = useState(false);
   const [matchId, setMatchId] = useState(null);
   const [holeNr, setHoleNr] = useState(null);
   const [disabledNehrano, setDisabledNehrano] = useState(true);
-
-  const matches = useMatches();
-
-  if(!matches) {
-    return ("Loading...")
-  }
-
-  const matchFilter = matches.filter(m => {return m.id.substring(0, 10) === props.currentRound.date && (m.players_lat.includes(props.currentUser.id) || m.players_stt.includes(props.currentUser.id))})
-  if (matchFilter.length === 0) {
-    return ("Nenašel jsem zápas")
-  }
-  const match = matchFilter[0];
 
   const onScoreEdit = (e) => {
     e.preventDefault();
@@ -143,10 +135,10 @@ export const ScorecardRyderMatch = (props) => {
 
   }
 
-  const ninesScores = Array.from({ length: props.currentRound.holes / 9 }, (_, index) => (
+  const ninesScores = Array.from({ length: props.roundHoles / 9 }, (_, index) => (
     <ScorecardRyderMatchNine 
       nine={index+1} 
-      match={match} 
+      match={props.match} 
       onClick={onScoreEdit}
       setMatchId={setMatchId}
       setHoleNr={setHoleNr}
@@ -160,7 +152,7 @@ export const ScorecardRyderMatch = (props) => {
 
   return (
     <>
-      <InfoMatch match={match} />
+      <InfoMatch match={props.match} />
       <table className="scoretable">
         <colgroup>
           <col className="scoretablefirstcol" />
@@ -174,8 +166,27 @@ export const ScorecardRyderMatch = (props) => {
         matchId={matchId}
         holeNr={holeNr}
         disabledNehrano={disabledNehrano}
-        totalHolesCount={props.currentRound.holes}
+        totalHolesCount={props.roundHoles}
       />
     </>
   )
+}
+
+export const ScorecardRyderMatch = (props) => {
+  const matches = useMatches();
+
+  if(!matches) {
+    return ("Loading...")
+  }
+
+  const matchFilter = matches.filter(m => {return m.id.substring(0, 10) === props.currentRound.date && (m.players_lat.includes(props.currentUser.id) || m.players_stt.includes(props.currentUser.id))})
+  if (matchFilter.length === 0) {
+    return ("Nenašel jsem zápas")
+  }
+  const match = matchFilter[0];
+
+  return (
+    <ScorecardRyderMatchId match={match} roundHoles={props.currentRound.holes} />
+  )
+
 }

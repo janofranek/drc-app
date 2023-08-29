@@ -1,14 +1,14 @@
 import React, {useState} from 'react';
-import { Navigate  } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { Table, Button, Container, Tabs, Tab, Form, Accordion } from "react-bootstrap";
 import "./Common.css"
 import { useUsers } from '../data/UsersDataProvider';
 import { useAuth } from '../data/AuthProvider';
 import { useCourses } from '../data/CoursesDataProvider';
 import { useTournaments } from '../data/TournamentsDataProvider';
-import { SkoreFlightAccHeader, SkoreFlightAccBody } from "./ScorecardFlight.js"
-import { getScorecardId, createNewScorecard, resetScorecard } from "./Utils.js"
-import NoActiveTournament from "./NoActiveTournament"
+import { SkoreFlightAccHeader, SkoreFlightAccBody } from "./ScorecardFlight.js";
+import { getScorecardId, createNewScorecard, resetScorecard } from "./Utils.js";
+import NoActiveTournament from "./NoActiveTournament";
 
 
 const UsersTable = () => {
@@ -23,7 +23,6 @@ const UsersTable = () => {
         <tr>
           <th>ID</th>
           <th>Jméno</th>
-          <th>Zkratka</th>
           <th>E-mail</th>
           <th>HCP</th>
         </tr>
@@ -33,7 +32,6 @@ const UsersTable = () => {
           return <tr key={"users_row_" + index}>
               <td>{row.id}</td>
               <td>{row.name}</td>
-              <td>{row.short}</td>
               <td>{row.email}</td>
               <td>{row.hcp}</td>
             </tr>;
@@ -54,7 +52,7 @@ const AdminSkorkyTournamentUnknown = (props) => {
 const AdminSkorkyTournamentRyderCup = (props) => {
   return (
     <>
-      <p>TODO - AktualKolo Ryder Cup - {props.tournamentId}</p>
+      <p>Nothing to do here - Ryder Cup - {props.tournamentId}</p>
     </>
   )
 }
@@ -173,12 +171,13 @@ const AktualKoloTournamentUnknown = (props) => {
 const AktualKoloTournamentRyderCup = (props) => {
   return (
     <>
-      <p>TODO - AktualKolo Ryder Cup - {props.tournamentId}</p>
+      <p>Nothing to do here - Ryder Cup - {props.tournamentId}</p>
     </>
   )
 }
 
 const AktualKoloTournamentStableford = (props) => {
+
   return (
     <>
       <Accordion>
@@ -203,7 +202,7 @@ const AktualKolo = () => {
   const tournaments = useTournaments();
 
   //while data not loaded, show Loading...
-  if (!tournaments) return "Loading..."
+  if (!tournaments ) return "Loading ... AktualKolo"
 
   //if there is no active tournament or round, just show basic info
   if (tournaments.filter(tournament => tournament.active === "1").length === 0) {
@@ -221,7 +220,7 @@ const AktualKolo = () => {
   if (tournamentSystem === "stableford") {
     return(<AktualKoloTournamentStableford currTournament={currTournament} currRound={currRound} />)
   } else if (tournamentSystem === "rydercup") {
-    return(<AktualKoloTournamentRyderCup tournamentId={tournamentId} />)
+    return(<AktualKoloTournamentRyderCup tournamentId={tournamentId}/>)
   } else {
     return(<AktualKoloTournamentUnknown tournamentId={tournamentId} tournamentSystem={tournamentSystem} />)
   }

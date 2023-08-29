@@ -17,7 +17,7 @@ export const ScorecardsDataProvider = ({ children }) => {
         setScorecards(newData);
       },
       (error) => {
-        console.log("Nepovedlo se načíst skórkarty")
+        console.log("Nepovedlo se načíst skórkarty: " + error.message)
       });
     return () => { 
       unsub();

@@ -17,7 +17,7 @@ export const MatchesDataProvider = ({ children }) => {
         setMatches(newData);
       },
       (error) => {
-        console.log("Nepovedlo se načíst zápasy")
+        console.log("Nepovedlo se načíst zápasy: " + error.message)
       });
     return () => { 
       unsub();
