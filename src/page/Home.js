@@ -11,13 +11,12 @@ import { formatRyderStatus, getRyderStandings, getLastRyderMatch } from "./Utils
 const HomePage = (props) => {
 
   const lastRyderMatch = getLastRyderMatch(props.tournaments)
-  console.log(lastRyderMatch)
 
   const ryderMatchStatus = useMemo(
     () => { 
-      return getRyderStandings(props.matches);
+      return getRyderStandings(props.matches, lastRyderMatch.datestart, lastRyderMatch.dateend);
     },
-    [props]
+    [props, lastRyderMatch]
   )
 
   return (
@@ -27,11 +26,11 @@ const HomePage = (props) => {
           <tr>
             <th colSpan={2}><div className="centeralign">Dance Ryder Cup 2024 - Kácov - 30.8-1.9</div></th>
           </tr>
-          <tr>
-          <th colSpan={2}><div className="centeralign">{lastRyderMatch.datestart}</div></th>
-          </tr>
-          </thead>
+        </thead>
         <tbody>
+          <tr>
+            <td colSpan={2}><div className="centeralign">XX {lastRyderMatch.datestart} XX</div></td>
+          </tr>
           <tr>
             <td><img className="drcimage" src={logoStt} alt="DRC logo standard" /></td>
             <td><img className="drcimage" src={logoLat} alt="DRC logo latin" /></td>

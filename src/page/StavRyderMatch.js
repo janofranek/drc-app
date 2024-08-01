@@ -39,7 +39,7 @@ export const StavRyderMatchInfo = (props) =>  {
 
 const HeaderRyderMatchesDay = (props) =>  {
 
-  const dayStandings = getRyderStandings(props.matches, props.round.date);
+  const dayStandings = getRyderStandings(props.matches, props.round.date, props.round.date);
   const allMatchesFinal = (props.matches.filter(m => (m.id.substring(0, 10) === props.round.date && !m.final)).length === 0)
 
   return (

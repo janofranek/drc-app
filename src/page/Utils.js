@@ -238,17 +238,23 @@ const formatRyderStatus = (score) => {
 }
 
 const getLastRyderMatch = (allTournaments) => {
-    console.log(allTournaments)
-    const tournaments = allTournaments.filter( t => (t.system === "rydercup"))
-    console.log(tournaments)
-    const lastStartDate = tournaments.reduce((a, v) => Math.max(a, v.datestart), tournaments[0].datestart)
-    console.log(lastStartDate)
-    return tournaments.filter( t => (t.datestart === lastStartDate))
 
+    const tournaments = allTournaments.filter( t => (t.system === "rydercup"))
+
+    let lastStartDate = tournaments[0].datestart
+
+    for (let i = 1; i < tournaments.length; i++) {
+        if (tournaments[i].datestart > lastStartDate) {
+            lastStartDate = tournaments[i].datestart;
+        }
+    }
+
+    return tournaments.filter( t => (t.datestart === lastStartDate))[0]
 }
 
-const getRyderStandings = (allMatches, date = null) => {
-    const matches = allMatches.filter( m => ( date == null || m.id.substring(0,10) === date))
+const getRyderStandings = (allMatches, datestart, dateend) => {
+
+    const matches = allMatches.filter( m => ( m.id.substring(0,10) >= datestart && m.id.substring(0,10) <= dateend))
 
     const sttFinal = matches
         .filter( m => m.final && m.final_score <= 0 )
