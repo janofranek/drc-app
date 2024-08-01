@@ -237,6 +237,16 @@ const formatRyderStatus = (score) => {
 
 }
 
+const getLastRyderMatch = (allTournaments) => {
+    console.log(allTournaments)
+    const tournaments = allTournaments.filter( t => (t.system === "rydercup"))
+    console.log(tournaments)
+    const lastStartDate = tournaments.reduce((a, v) => Math.max(a, v.datestart), tournaments[0].datestart)
+    console.log(lastStartDate)
+    return tournaments.filter( t => (t.datestart === lastStartDate))
+
+}
+
 const getRyderStandings = (allMatches, date = null) => {
     const matches = allMatches.filter( m => ( date == null || m.id.substring(0,10) === date))
 
@@ -272,4 +282,4 @@ const getRyderStandings = (allMatches, date = null) => {
 export { getScorecardId, getPlayingHCP, getHolesHCP, getHoleShots, setHoleScore, getRyderStandings,
     getRoundSkore, getTeamRoundSkore, getFlight, createNewScorecard, resetScorecard, getRyderHoleClass,
     getRyderHoleScore, getRyderMatchClass, getRyderMatchText, setMatchScore, formatRyderStatus,
-    checkUserAdmin }
+    checkUserAdmin, getLastRyderMatch }

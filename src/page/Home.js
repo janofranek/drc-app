@@ -5,9 +5,13 @@ import { useAuth } from '../data/AuthProvider';
 import logoStt from "../assets/DRCstandard.png"
 import logoLat from "../assets/DRClatin.png"
 import { useMatches } from "../data/MatchesDataProvider"
-import { formatRyderStatus, getRyderStandings } from "./Utils"
+import { useTournaments } from '../data/TournamentsDataProvider';
+import { formatRyderStatus, getRyderStandings, getLastRyderMatch } from "./Utils"
 
 const HomePage = (props) => {
+
+  const lastRyderMatch = getLastRyderMatch(props.tournaments)
+  console.log(lastRyderMatch)
 
   const ryderMatchStatus = useMemo(
     () => { 
@@ -21,9 +25,12 @@ const HomePage = (props) => {
       <table>
         <thead>
           <tr>
-            <th colSpan={2}><div className="centeralign">Dance Ryder Cup 2023 - Kácov - 1.9-3.9</div></th>
+            <th colSpan={2}><div className="centeralign">Dance Ryder Cup 2024 - Kácov - 30.8-1.9</div></th>
           </tr>
-        </thead>
+          <tr>
+          <th colSpan={2}><div className="centeralign">{lastRyderMatch.datestart}</div></th>
+          </tr>
+          </thead>
         <tbody>
           <tr>
             <td><img className="drcimage" src={logoStt} alt="DRC logo standard" /></td>
@@ -64,19 +71,21 @@ const Home = () => {
   //load data
   const authEmail = useAuth();
   const matches = useMatches();
+  const tournaments = useTournaments();
+  
 
   //if not logged in, redirect to login page
   if (!authEmail) {
     return <Navigate to="/login" />;
   }
 
-  if(!matches) {
-    return ("Loading .. .Home Page ... waiting for matches")
+  if(!matches || !tournaments) {
+    return ("Loading .. .Home Page ... waiting for data")
   }
 
   return (
     <>
-      <HomePage matches={matches}/>
+      <HomePage matches={matches} tournaments={tournaments}/>
     </>
   )
 
