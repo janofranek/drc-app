@@ -41,7 +41,7 @@ export const StavRyderMatchInfo = (props) =>  {
 
 const StavRyderMatchInfoFinal = (props) =>  {
 
-  const roundHoles = props.tournament.rounds.filter(r => !(r.date === props.match.id.substring(0, 10)) )[0].holes;
+  const roundHoles = props.tournament.rounds.filter(r => (r.date === props.match.id.substring(0, 10)) )[0].holes;
 
   const onClick = (e) => {
     e.preventDefault();
