@@ -8,3 +8,5 @@ OK - zobrazení minulých zápasů
 OK - home page - u neaktivního turnaje neukazovat průběžný stav
 
 stav page - u neaktivních dní Ryder nezobrazovat průběžný stav
+
+Kacov24
