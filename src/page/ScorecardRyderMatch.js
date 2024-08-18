@@ -176,7 +176,7 @@ export const ScorecardRyderMatch = (props) => {
   const matches = useMatches();
 
   if(!matches) {
-    return ("Loading...")
+    return ("Loading...matches")
   }
 
   const matchFilter = matches.filter(m => {return m.id.substring(0, 10) === props.currentRound.date && (m.players_lat.includes(props.currentUser.id) || m.players_stt.includes(props.currentUser.id))})

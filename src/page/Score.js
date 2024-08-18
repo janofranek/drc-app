@@ -112,7 +112,10 @@ const Score = () => {
   }
 
   //while data not loaded, show Loading...
-  if (!users || !courses || !tournaments) return "Loading..."
+  if (!users ) return "Loading...users"
+  if (!courses) return "Loading...courses"
+  if (!tournaments) return "Loading...tournaments"
+  //if (!users || !courses || !tournaments) return "Loading..."
   
   const currentUser = users.filter(user => user.email.toLowerCase() === authEmail.toLowerCase())[0]
 

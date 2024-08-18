@@ -4,12 +4,36 @@ import { Accordion, Alert } from "react-bootstrap";
 import "./Common.css"
 import { useAuth } from '../data/AuthProvider';
 import { useTournaments } from '../data/TournamentsDataProvider';
-import { StavStblJednotlivci, StavStblTymy } from "./StavStableford.js"
+import { useMatches } from "../data/MatchesDataProvider"
+import { StavStblJednotlivci, StavStblTymy } from "./StavStableford"
+import { StavRyderMatchTotal, StavRyderMatchDetail } from "./StavRyderMatch"
+
+const HistoryOneTournament = (props) => {
+
+  if (props.tournament.system === "stableford") {
+    return (
+      <>
+        <StavStblJednotlivci tournamentId={props.tournament.id}/>
+        <StavStblTymy tournamentId={props.tournament.id}/>
+      </>
+    )
+  } else if (props.tournament.system === "rydercup") {
+    return (
+      <>
+        <StavRyderMatchTotal tournament={props.tournament} matches={props.matches}/>
+        <StavRyderMatchDetail tournament={props.tournament} matches={props.matches}/>
+      </>
+    )
+  }
+
+
+}
 
 const History = () => {
 
   //load data
   const authEmail = useAuth();
+  const matches = useMatches();
   const tournaments = useTournaments();
 
   //if not logged in, redirect to login page
@@ -17,7 +41,7 @@ const History = () => {
     return <Navigate to="/login" />;
   }
 
-  if(!tournaments) {
+  if(!tournaments || !matches) {
     return ("Loading...")
   }
 
@@ -44,8 +68,7 @@ const History = () => {
               <Accordion.Item eventKey={index} key={index} >
                 <Accordion.Header>{tournament.id}</Accordion.Header>
                 <Accordion.Body>
-                  <StavStblJednotlivci tournamentId={tournament.id}/>
-                  <StavStblTymy tournamentId={tournament.id}/>
+                  <HistoryOneTournament tournament={tournament} matches={matches}/>
                 </Accordion.Body>
               </Accordion.Item>
             </>

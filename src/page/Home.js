@@ -1,62 +1,19 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 import { Navigate, Link } from "react-router-dom";
 import "./Common.css"
 import { useAuth } from '../data/AuthProvider';
-import logoStt from "../assets/DRCstandard.png"
-import logoLat from "../assets/DRClatin.png"
 import { useMatches } from "../data/MatchesDataProvider"
 import { useTournaments } from '../data/TournamentsDataProvider';
-import { formatRyderStatus, getRyderStandings, getLastRyderMatch } from "./Utils"
+import { getLastRyderMatch } from "./Utils"
+import { StavRyderMatchTotal } from "./StavRyderMatch"
 
 const HomePage = (props) => {
 
   const lastRyderMatch = getLastRyderMatch(props.tournaments)
 
-  const ryderMatchStatus = useMemo(
-    () => { 
-      return getRyderStandings(props.matches, lastRyderMatch.datestart, lastRyderMatch.dateend);
-    },
-    [props, lastRyderMatch]
-  )
-
   return (
     <>
-      <table>
-        <thead>
-          <tr>
-            <th colSpan={2}><div className="centeralign">Dance Ryder Cup 2024 - Kácov - 30.8-1.9</div></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td colSpan={2}><div className="centeralign">XX {lastRyderMatch.datestart} XX</div></td>
-          </tr>
-          <tr>
-            <td><img className="drcimage" src={logoStt} alt="DRC logo standard" /></td>
-            <td><img className="drcimage" src={logoLat} alt="DRC logo latin" /></td>
-          </tr>
-        </tbody>
-      </table>
-      <div className="ryder-score-table">
-      <table>
-        <tbody>
-          <tr>
-            <td colSpan={2}>Stav</td>
-          </tr>
-          <tr>
-            <td><div className="ryder-score-total stt-final">{formatRyderStatus(ryderMatchStatus.sttFinal)}</div></td>
-            <td><div className="ryder-score-total lat-final">{formatRyderStatus(ryderMatchStatus.latFinal)}</div></td>
-          </tr>
-          <tr>
-            <td colSpan={2}>Průběžný stav</td>
-          </tr>
-          <tr>
-            <td><div className="ryder-score-total stt-prelim">{formatRyderStatus(ryderMatchStatus.sttPrelim)}</div></td>
-            <td><div className="ryder-score-total lat-prelim">{formatRyderStatus(ryderMatchStatus.latPrelim)}</div></td>
-          </tr>
-        </tbody>
-      </table>
-      </div>
+      <StavRyderMatchTotal tournament={lastRyderMatch} matches={props.matches}/>
       <div className="home-footer">
       <Link to="/history"> Minulé turnaje </Link>
       </div>
