@@ -1,0 +1,10 @@
+OK -stav zápasu se neaktulizuje po zadání výsledku jamky
+- jenom při zadávání přes Modal, zřejmě to je vlastnost Modalu
+
+OK - zobrazení minulých zápasů
+- správně zobrazit Ryder
+- uložit celkový výsledek do tournaments ?
+
+OK - home page - u neaktivního turnaje neukazovat průběžný stav
+
+stav page - u neaktivních dní Ryder nezobrazovat průběžný stav
