@@ -3,19 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "bootstrap": "^5.2.3",
-    "dotenv": "^16.4.5",
-    "firebase": "^10.12.4",
-    "jquery": "^3.6.4",
-    "react": "^18.2.0",
-    "react-bootstrap": "^2.7.4",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.11.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "bootstrap": "^5.3.8",
+    "firebase": "^12.6.0",
+    "react": "^19.2.1",
+    "react-bootstrap": "^2.10.10",
+    "react-dom": "^19.2.1",
+    "react-router-dom": "^7.10.1",
     "react-scripts": "^5.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^5.1.0"
   },
   "scripts": {
     "start": "serve -s build",
@@ -42,8 +39,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "webpack-cli": "^5.1.1"
   }
 }
