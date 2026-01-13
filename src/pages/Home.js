@@ -1,11 +1,11 @@
 import React from 'react';
 import { Navigate, Link } from "react-router-dom";
-import "./Common.css"
+import "../components/Common.css"
 import { useAuth } from '../data/AuthProvider';
 import { useMatches } from "../data/MatchesDataProvider"
 import { useTournaments } from '../data/TournamentsDataProvider';
-import { getLastRyderMatch } from "./Utils"
-import { StavRyderMatchTotal } from "./StavRyderMatch"
+import { getLastRyderMatch } from "../utils/Utils"
+import { RyderMatchStandingsTotal } from "../components/StandingsRyderMatch"
 
 const HomePage = (props) => {
 
@@ -13,9 +13,9 @@ const HomePage = (props) => {
 
   return (
     <>
-      <StavRyderMatchTotal tournament={lastRyderMatch} matches={props.matches}/>
+      <RyderMatchStandingsTotal tournament={lastRyderMatch} matches={props.matches} />
       <div className="home-footer">
-      <Link to="/history"> Minulé turnaje </Link>
+        <Link to="/history"> Minulé turnaje </Link>
       </div>
     </>
   )
@@ -28,20 +28,20 @@ const Home = () => {
   const authEmail = useAuth();
   const matches = useMatches();
   const tournaments = useTournaments();
-  
+
 
   //if not logged in, redirect to login page
   if (!authEmail) {
     return <Navigate to="/login" />;
   }
 
-  if(!matches || !tournaments) {
+  if (!matches || !tournaments) {
     return ("Loading .. .Home Page ... waiting for data")
   }
 
   return (
     <>
-      <HomePage matches={matches} tournaments={tournaments}/>
+      <HomePage matches={matches} tournaments={tournaments} />
     </>
   )
 

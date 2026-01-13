@@ -1,23 +1,23 @@
-import React, {useState} from 'react';
-import { Navigate  } from "react-router-dom";
+import React, { useState } from 'react';
+import { Navigate } from "react-router-dom";
 import { Accordion, ButtonGroup, ToggleButton } from "react-bootstrap";
-import "./Common.css"
+import "../components/Common.css"
 import { useAuth } from '../data/AuthProvider';
 import { useUsers } from '../data/UsersDataProvider';
 import { useCourses } from '../data/CoursesDataProvider';
 import { useTournaments } from '../data/TournamentsDataProvider';
-import { InfoPlayer, ScorecardPlayer } from "./ScorecardPlayer.js"
-import { SkoreFlightTable, SkoreFlightAccHeader, SkoreFlightAccBody } from "./ScorecardFlight.js"
-import { ScorecardRyderMatch } from "./ScorecardRyderMatch.js"
-import NoActiveTournament from "./NoActiveTournament"
-import { getScorecardId, getFlight } from "./Utils.js"
+import { InfoPlayer, ScorecardPlayer } from "../components/ScorecardPlayer.js"
+import { ScoreFlightTable, ScoreFlightAccHeader, ScoreFlightAccBody } from "../components/ScorecardFlight.js"
+import { ScorecardRyderMatch } from "../components/ScorecardRyderMatch.js"
+import NoActiveTournament from "../components/NoActiveTournament"
+import { getScorecardId, getFlight } from "../utils/Utils.js"
 
 const ScorePlayer = (props) => {
 
   return (
     <>
-      <InfoPlayer scorecardId={props.scorecardId}/>
-      <ScorecardPlayer scorecardId={props.scorecardId}/>
+      <InfoPlayer scorecardId={props.scorecardId} />
+      <ScorecardPlayer scorecardId={props.scorecardId} />
     </>
   )
 }
@@ -28,14 +28,14 @@ const ScoreFlight = (props) => {
 
   return (
     <>
-      <SkoreFlightTable currentFlight={currentFlight} currentRound={props.currentRound}/>
+      <ScoreFlightTable currentFlight={currentFlight} currentRound={props.currentRound} />
       <Accordion>
-        {currentFlight.map((player, index) => { 
-          return(
+        {currentFlight.map((player, index) => {
+          return (
             <>
               <Accordion.Item eventKey={index} key={index} >
-                <SkoreFlightAccHeader player={player} currentRound={props.currentRound}/>
-                <SkoreFlightAccBody player={player} currentRound={props.currentRound}/> 
+                <ScoreFlightAccHeader player={player} currentRound={props.currentRound} />
+                <ScoreFlightAccBody player={player} currentRound={props.currentRound} />
               </Accordion.Item>
             </>
           )
@@ -92,7 +92,7 @@ const ScoreTournamentStableford = (props) => {
         ))}
       </ButtonGroup>
 
-      {(radioValue==="1" ? <ScorePlayer scorecardId={scorecardId}/> : <ScoreFlight currentUser={props.currentUser} currentRound={props.currentRound}/>)}
+      {(radioValue === "1" ? <ScorePlayer scorecardId={scorecardId} /> : <ScoreFlight currentUser={props.currentUser} currentRound={props.currentRound} />)}
     </div>
   )
 
@@ -112,11 +112,11 @@ const Score = () => {
   }
 
   //while data not loaded, show Loading...
-  if (!users ) return "Loading...users"
+  if (!users) return "Loading...users"
   if (!courses) return "Loading...courses"
   if (!tournaments) return "Loading...tournaments"
   //if (!users || !courses || !tournaments) return "Loading..."
-  
+
   const currentUser = users.filter(user => user.email.toLowerCase() === authEmail.toLowerCase())[0]
 
   //if there is no active tournament or round, just show basic info
@@ -133,23 +133,23 @@ const Score = () => {
   const currentRound = currTournament.rounds.filter(round => round.active === "1")[0]
 
   if (tournamentSystem === "stableford") {
-    return(<ScoreTournamentStableford 
-              tournamentId={tournamentId} 
-              currentRound={currentRound} 
-              currentUser={currentUser}
-            />)
+    return (<ScoreTournamentStableford
+      tournamentId={tournamentId}
+      currentRound={currentRound}
+      currentUser={currentUser}
+    />)
   } else if (tournamentSystem === "rydercup") {
-    return(<ScoreTournamentRyderCup 
-              currTournament={currTournament} 
-              currentRound={currentRound} 
-              currentUser={currentUser}
-              readOnly={false}
-            />)
+    return (<ScoreTournamentRyderCup
+      currTournament={currTournament}
+      currentRound={currentRound}
+      currentUser={currentUser}
+      readOnly={false}
+    />)
   } else {
-    return(<ScoreTournamentUnknown 
-              tournamentId={tournamentId} 
-              tournamentSystem={tournamentSystem} 
-            />)
+    return (<ScoreTournamentUnknown
+      tournamentId={tournamentId}
+      tournamentSystem={tournamentSystem}
+    />)
   }
 }
 

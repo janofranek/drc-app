@@ -1,14 +1,14 @@
-import React, {useState} from 'react';
-import { Navigate  } from "react-router-dom";
+import React, { useState } from 'react';
+import { Navigate } from "react-router-dom";
 import { ButtonGroup, ToggleButton } from "react-bootstrap";
-import "./Common.css"
+import "../components/Common.css"
 import { useAuth } from '../data/AuthProvider';
 import { useTournaments } from '../data/TournamentsDataProvider';
-import { StavStblJednotlivci, StavStblTymy } from "./StavStableford.js"
-import NoActiveTournament from "./NoActiveTournament"
-import StavRyderMatch from "./StavRyderMatch"
+import { StablefordStandingsIndividuals, StablefordStandingsTeams } from "../components/StandingsStableford.js"
+import NoActiveTournament from "../components/NoActiveTournament"
+import RyderMatchStandings from "../components/StandingsRyderMatch"
 
-const StavTournamentUnknown = (props) => {
+const StandingsTournamentUnknown = (props) => {
   return (
     <>
       <p>Nepodporovaný systém turnaje - {props.tournamentId} - {props.tournamentSystem}</p>
@@ -16,7 +16,7 @@ const StavTournamentUnknown = (props) => {
   )
 }
 
-const StavTournamentStableford = (props) => {
+const StandingsTournamentStableford = (props) => {
   const [radioValue, setRadioValue] = useState('1');
 
   const radios = [
@@ -44,15 +44,15 @@ const StavTournamentStableford = (props) => {
         ))}
       </ButtonGroup>
 
-      {(radioValue==="1" 
-        ? <StavStblJednotlivci tournamentId={props.tournamentId}/> 
-        : <StavStblTymy tournamentId={props.tournamentId}/>)}
+      {(radioValue === "1"
+        ? <StablefordStandingsIndividuals tournamentId={props.tournamentId} />
+        : <StablefordStandingsTeams tournamentId={props.tournamentId} />)}
 
     </div>
   )
 }
 
-const Stav = () => {
+const Standings = () => {
 
   //load data
   const authEmail = useAuth();
@@ -63,7 +63,7 @@ const Stav = () => {
     return <Navigate to="/login" />;
   }
 
-  if(!tournaments) {
+  if (!tournaments) {
     return ("Loading...")
   }
 
@@ -80,14 +80,14 @@ const Stav = () => {
   const tournamentId = currTournament.id;
 
   if (tournamentSystem === "stableford") {
-    return(<StavTournamentStableford tournamentId={tournamentId} />)
+    return (<StandingsTournamentStableford tournamentId={tournamentId} />)
   } else if (tournamentSystem === "rydercup") {
-    return(<StavRyderMatch tournament={currTournament} />)
+    return (<RyderMatchStandings tournament={currTournament} />)
   } else {
-    return(<StavTournamentUnknown tournamentId={tournamentId} tournamentSystem={tournamentSystem} />)
+    return (<StandingsTournamentUnknown tournamentId={tournamentId} tournamentSystem={tournamentSystem} />)
   }
 
-  
+
 }
- 
-export default Stav
+
+export default Standings

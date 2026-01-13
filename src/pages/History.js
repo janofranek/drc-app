@@ -1,27 +1,27 @@
 import React from 'react';
 import { Navigate } from "react-router-dom";
 import { Accordion, Alert } from "react-bootstrap";
-import "./Common.css"
+import "../components/Common.css"
 import { useAuth } from '../data/AuthProvider';
 import { useTournaments } from '../data/TournamentsDataProvider';
 import { useMatches } from "../data/MatchesDataProvider"
-import { StavStblJednotlivci, StavStblTymy } from "./StavStableford"
-import { StavRyderMatchTotal, StavRyderMatchDetail } from "./StavRyderMatch"
+import { StablefordStandingsIndividuals, StablefordStandingsTeams } from "../components/StandingsStableford"
+import { RyderMatchStandingsTotal, RyderMatchStandingsDetail } from "../components/StandingsRyderMatch"
 
 const HistoryOneTournament = (props) => {
 
   if (props.tournament.system === "stableford") {
     return (
       <>
-        <StavStblJednotlivci tournamentId={props.tournament.id}/>
-        <StavStblTymy tournamentId={props.tournament.id}/>
+        <StablefordStandingsIndividuals tournamentId={props.tournament.id} />
+        <StablefordStandingsTeams tournamentId={props.tournament.id} />
       </>
     )
   } else if (props.tournament.system === "rydercup") {
     return (
       <>
-        <StavRyderMatchTotal tournament={props.tournament} matches={props.matches}/>
-        <StavRyderMatchDetail tournament={props.tournament} matches={props.matches}/>
+        <RyderMatchStandingsTotal tournament={props.tournament} matches={props.matches} />
+        <RyderMatchStandingsDetail tournament={props.tournament} matches={props.matches} />
       </>
     )
   }
@@ -41,7 +41,7 @@ const History = () => {
     return <Navigate to="/login" />;
   }
 
-  if(!tournaments || !matches) {
+  if (!tournaments || !matches) {
     return ("Loading...")
   }
 
@@ -68,7 +68,7 @@ const History = () => {
               <Accordion.Item eventKey={index} key={index} >
                 <Accordion.Header>{tournament.id}</Accordion.Header>
                 <Accordion.Body>
-                  <HistoryOneTournament tournament={tournament} matches={matches}/>
+                  <HistoryOneTournament tournament={tournament} matches={matches} />
                 </Accordion.Body>
               </Accordion.Item>
             </>
