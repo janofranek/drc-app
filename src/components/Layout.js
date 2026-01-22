@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { signOut } from "firebase/auth";
 import { auth } from '../cred/firebase';
 import { Outlet, Link } from "react-router-dom";
-import { Container, Navbar, Nav, Button, Alert } from "react-bootstrap";
+import { Container, Navbar, Nav, Button, Alert, NavDropdown } from "react-bootstrap";
 import { useUsers } from '../data/UsersDataProvider';
 import { useAuth } from '../data/AuthProvider';
 import { checkUserAdmin } from "../utils/Utils"
@@ -53,11 +53,18 @@ const Layout = () => {
               <Nav className="justify-content-end">
                 {authEmail &&
                   <>
-                    <Nav.Link as={Link} to="/skore">Skóre</Nav.Link>
+                    <Nav.Link as={Link} to="/score">Skóre</Nav.Link>
                     <Nav.Link as={Link} to="/standings">Stav</Nav.Link>
                   </>
                 }
-                {checkUserAdmin(authEmail, users) && <Nav.Link as={Link} to="/admin">Admin</Nav.Link>}
+                {checkUserAdmin(authEmail, users) &&
+                  <NavDropdown title="Admin" id="basic-nav-dropdown">
+                    <NavDropdown.Item as={Link} to="/admin/current-round">Průběžný stav</NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/admin/scorecards">Správa skóre</NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/admin/tournaments">Správa turnajů</NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/admin/users">Správa uživatelů</NavDropdown.Item>
+                  </NavDropdown>
+                }
               </Nav>
               <Navbar.Text>
                 <NavText userEmail={authEmail} onLogout={onLogout} />

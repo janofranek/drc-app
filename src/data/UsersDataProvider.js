@@ -1,26 +1,10 @@
-import React, {useState, useEffect, useContext} from 'react';
-import { db } from '../cred/firebase';
-import { collection, getDocs } from "firebase/firestore";
+import React, { useContext } from 'react';
+import { useFirestoreCollection } from '../hooks/useFirestoreCollection';
 
 const Context = React.createContext();
 
 export const UsersDataProvider = ({ children }) => {
-  const [users, setUsers] = useState();
-
-  const fetchUsers = async () => {
-       
-    await getDocs(collection(db, "users"))
-        .then((querySnapshot)=>{              
-            const newData = querySnapshot.docs
-                .map((doc) => ({...doc.data(), id:doc.id }));
-            setUsers(newData);      
-        })
-  }
-
-  useEffect( () => {
-    fetchUsers();
-    return () => { setUsers(null) };
-  }, [])
+  const users = useFirestoreCollection("users", "Nepovedlo se načíst uživatele");
 
   return (
     <Context.Provider value={users}>

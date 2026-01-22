@@ -88,7 +88,7 @@ const ScoreFlightCell = (props) => {
 
   return (
     <td>
-      <label for={"skore" + props.data.short}>{props.data.short}</label><br />
+      <label for={"score" + props.data.short}>{props.data.short}</label><br />
       <input type="tel"
         className="flightscoreinput"
         id={props.data.scorecardId + "/" + props.holeSelect}

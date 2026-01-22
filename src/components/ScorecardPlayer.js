@@ -74,7 +74,7 @@ const Dots = (props) => {
   }
 }
 
-const HoleSkore = (props) => {
+const HoleScore = (props) => {
   const [formData, setFormData] = useState({});
 
   function handleBlur(e) {
@@ -159,7 +159,7 @@ const ScorecardNine = (props) => {
     <>
       <HoleNumbers nine={props.nine} nineHoles={nineHoles} />
       <tbody>
-        <HoleSkore nine={props.nine} nineHoles={nineHoles} scorecardId={props.scorecard.id} readOnly={props.readOnly} />
+        <HoleScore nine={props.nine} nineHoles={nineHoles} scorecardId={props.scorecard.id} readOnly={props.readOnly} />
       </tbody>
     </>
   )

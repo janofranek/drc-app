@@ -11,6 +11,16 @@ const HomePage = (props) => {
 
   const lastRyderMatch = getLastRyderMatch(props.tournaments)
 
+  if (!lastRyderMatch) {
+    return (
+      <>
+        <div className="home-footer">
+          <Link to="/history"> Minulé turnaje </Link>
+        </div>
+      </>
+    )
+  }
+
   return (
     <>
       <RyderMatchStandingsTotal tournament={lastRyderMatch} matches={props.matches} />

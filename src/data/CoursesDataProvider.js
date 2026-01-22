@@ -1,27 +1,10 @@
-import React, {useState, useEffect, useContext} from 'react';
-import { db } from '../cred/firebase';
-import { collection, getDocs } from "firebase/firestore";
+import React, { useContext } from 'react';
+import { useFirestoreCollection } from '../hooks/useFirestoreCollection';
 
 const Context = React.createContext();
 
 export const CoursesDataProvider = ({ children }) => {
-  const [courses, setCourses] = useState();
-
-  const fetchCourses = async () => {
-       
-    await getDocs(collection(db, "courses"))
-        .then((querySnapshot)=>{              
-            const newData = querySnapshot.docs
-                .map((doc) => ({...doc.data(), id:doc.id }));
-            setCourses(newData);      
-        })
-        .catch(error => console.log("Nepovedlo se načíst hřiště: " + error.message))
-  }
-
-  useEffect( () => {
-    fetchCourses();
-    return () => { setCourses(null) };
-  }, [])
+  const courses = useFirestoreCollection("courses", "Nepovedlo se načíst hřiště");
 
   return (
     <Context.Provider value={courses}>

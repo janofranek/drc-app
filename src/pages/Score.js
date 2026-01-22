@@ -120,17 +120,17 @@ const Score = () => {
   const currentUser = users.filter(user => user.email.toLowerCase() === authEmail.toLowerCase())[0]
 
   //if there is no active tournament or round, just show basic info
-  if (tournaments.filter(tournament => tournament.active === "1").length === 0) {
+  if (tournaments.filter(tournament => tournament.active).length === 0) {
     return <NoActiveTournament />
   }
-  if (tournaments.filter(tournament => tournament.active === "1")[0].rounds.filter(round => round.active === "1").length === 0) {
+  if (tournaments.filter(tournament => tournament.active)[0].rounds.filter(round => round.active).length === 0) {
     return <NoActiveTournament />
   }
 
-  const currTournament = tournaments.filter(tournament => tournament.active === "1")[0]
+  const currTournament = tournaments.filter(tournament => tournament.active)[0]
   const tournamentSystem = currTournament.system;
   const tournamentId = currTournament.id;
-  const currentRound = currTournament.rounds.filter(round => round.active === "1")[0]
+  const currentRound = currTournament.rounds.filter(round => round.active)[0]
 
   if (tournamentSystem === "stableford") {
     return (<ScoreTournamentStableford

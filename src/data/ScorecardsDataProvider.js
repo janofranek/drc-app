@@ -1,29 +1,10 @@
-import React, {useState, useEffect, useContext} from 'react';
-import { db } from '../cred/firebase';
-import { collection, onSnapshot } from "firebase/firestore";
+import React, { useContext } from 'react';
+import { useFirestoreCollection } from '../hooks/useFirestoreCollection';
 
 const Context = React.createContext();
 
 export const ScorecardsDataProvider = ({ children }) => {
-  const [scorecards, setScorecards] = useState();
-
-  useEffect(()=>{
-    const unsub = onSnapshot(collection(db, 'scorecards'),
-      (snapshot) => {
-        const newData = [];
-        snapshot.forEach((doc) => {
-          newData.push({...doc.data(), id:doc.id })
-        });
-        setScorecards(newData);
-      },
-      (error) => {
-        console.log("Nepovedlo se načíst skórkarty: " + error.message)
-      });
-    return () => { 
-      unsub();
-      setScorecards(null) 
-    };
-  }, [])
+  const scorecards = useFirestoreCollection("scorecards", "Nepovedlo se načíst skórkarty");
 
   return (
     <Context.Provider value={scorecards}>

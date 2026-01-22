@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import Score from './pages/Score';
@@ -14,6 +14,10 @@ import { CoursesDataProvider } from "./data/CoursesDataProvider";
 import { TournamentsDataProvider } from "./data/TournamentsDataProvider";
 import { ScorecardsDataProvider } from "./data/ScorecardsDataProvider";
 import { MatchesDataProvider } from './data/MatchesDataProvider';
+import AdminScorecards from "./components/AdminScorecards";
+import UsersTable from "./components/UsersTable";
+import CurrentRound from "./components/CurrentRound";
+import AdminTournaments from "./components/AdminTournaments";
 
 function AppRouter() {
   return (
@@ -23,9 +27,15 @@ function AppRouter() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="login" element={<LoginRegister />} />
-            <Route path="skore" element={<Score />} />
+            <Route path="score" element={<Score />} />
             <Route path="standings" element={<Standings />} />
-            <Route path="admin" element={<Admin />} />
+            <Route path="admin" element={<Admin />}>
+              <Route index element={<Navigate to="current-round" replace />} />
+              <Route path="users" element={<UsersTable />} />
+              <Route path="tournaments" element={<AdminTournaments />} />
+              <Route path="scorecards" element={<AdminScorecards />} />
+              <Route path="current-round" element={<CurrentRound />} />
+            </Route>
             <Route path="history" element={<History />} />
             <Route path="*" element={<NoPage />} />
           </Route>

@@ -139,11 +139,16 @@ const RyderMatchStandings = (props) => {
   const matches = useMatches();
   const users = useUsers();
 
+  const activeMatch = useMemo(() => {
+    if (!matches || !showMatch) return null;
+    return matches.find(m => m.id === showMatch.id) || showMatch;
+  }, [matches, showMatch]);
+
   if (!matches) {
     return ("Loading...")
   }
 
-  const currentRoundIndex = props.tournament.rounds.findIndex(round => round.active === "1")
+  const currentRoundIndex = props.tournament.rounds.findIndex(round => round.active)
 
   const hideModal = () => {
     setShowMatchModal(false);
@@ -179,7 +184,7 @@ const RyderMatchStandings = (props) => {
       <ModalRyderMatch
         showModal={showMatchModal}
         hideModal={hideModal}
-        match={showMatch}
+        match={activeMatch}
         roundHoles={roundHoles}
         readOnly={!checkUserAdmin(authEmail, users)}
       />
@@ -254,7 +259,7 @@ export const RyderMatchStandingsTotal = (props) => {
         <table>
           <tbody>
             <ShowRyderMatchStatus txt="Stav" prelim="0" sttScore={ryderMatchStatus.sttFinal} latScore={ryderMatchStatus.latFinal} />
-            {props.tournament.active === "1" && <ShowRyderMatchStatus txt="Průběžný stav" prelim="1" sttScore={ryderMatchStatus.sttPrelim} latScore={ryderMatchStatus.latPrelim} />}
+            {props.tournament.active && <ShowRyderMatchStatus txt="Průběžný stav" prelim="1" sttScore={ryderMatchStatus.sttPrelim} latScore={ryderMatchStatus.latPrelim} />}
           </tbody>
         </table>
       </div>
@@ -269,6 +274,11 @@ export const RyderMatchStandingsDetail = (props) => {
   const [roundHoles, setRoundHoles] = useState(0);
 
   const tournamentMatches = props.matches.filter(match => (match.id.substring(0, 10) >= props.tournament.datestart && match.id.substring(0, 10) <= props.tournament.dateend))
+
+  const activeMatch = useMemo(() => {
+    if (!props.matches || !showMatch) return null;
+    return props.matches.find(m => m.id === showMatch.id) || showMatch;
+  }, [props.matches, showMatch]);
 
   const hideModal = () => {
     setShowMatchModal(false);
@@ -306,7 +316,7 @@ export const RyderMatchStandingsDetail = (props) => {
       <ModalRyderMatch
         showModal={showMatchModal}
         hideModal={hideModal}
-        match={showMatch}
+        match={activeMatch}
         roundHoles={roundHoles}
         readOnly={true}
       />

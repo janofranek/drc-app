@@ -1,27 +1,10 @@
-import React, {useState, useEffect, useContext} from 'react';
-import { db } from '../cred/firebase';
-import { collection, getDocs } from "firebase/firestore";
+import React, { useContext } from 'react';
+import { useFirestoreCollection } from '../hooks/useFirestoreCollection';
 
 const Context = React.createContext();
 
 export const TournamentsDataProvider = ({ children }) => {
-  const [tournaments, setTournaments] = useState();
-
-  const fetchTournaments = async () => {
-       
-    await getDocs(collection(db, "tournaments"))
-        .then((querySnapshot)=>{              
-            const newData = querySnapshot.docs
-                .map((doc) => ({...doc.data(), id:doc.id }));
-            setTournaments(newData);      
-        })
-        .catch(error => console.log("Nepovedlo se načíst turnaje: " + error.message))
-  }
-
-  useEffect( () => {
-    fetchTournaments();
-    return () => { setTournaments(null) };
-  }, [])
+  const tournaments = useFirestoreCollection("tournaments", "Nepovedlo se načíst turnaje");
 
   return (
     <Context.Provider value={tournaments}>

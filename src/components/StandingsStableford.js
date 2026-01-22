@@ -4,7 +4,7 @@ import "./Common.css"
 import { useTournaments } from '../data/TournamentsDataProvider';
 import { useScorecards } from '../data/ScorecardsDataProvider';
 import { ScorecardPlayer } from "./ScorecardPlayer.js"
-import { getScorecardId, getRoundSkore, getTeamRoundSkore } from "../utils/Utils.js"
+import { getScorecardId, getRoundScore, getTeamRoundScore } from "../utils/Utils.js"
 
 const ResultsTableHeaders = (props) => {
   return (
@@ -64,11 +64,11 @@ const ResultsTableRow = (props) => {
         {props.currTournament.rounds.map((round, index) => {
           return (<><td key={"R" + round.date + props.counter}>
             <Button variant='link' type='submit' onClick={handleShow} id={getScorecardId(round.date, props.dataRow.player)} key={getScorecardId(round.date, props.dataRow.player)}>
-              {props.dataRow[round.date + "_skore"]}/{props.dataRow[round.date + "_stbl"]}
+              {props.dataRow[round.date + "_score"]}/{props.dataRow[round.date + "_stbl"]}
             </Button>
           </td></>)
         })}
-        <th key="DRTR" className="vertcenter">{props.dataRow.totalSkore}/{props.dataRow.totalStbl}</th>
+        <th key="DRTR" className="vertcenter">{props.dataRow.totalScore}/{props.dataRow.totalStbl}</th>
       </tr>
       <ScorecardModal showScorecard={showScorecard} scorecardId={scorecardId} handleClose={handleClose} />
     </>
@@ -92,15 +92,15 @@ const getResultsDataTable = (currTournament, scorecards) => {
 
   currTournament.players.forEach((player) => {
     let rowData = { "player": player }
-    let totalSkore = 0, totalStbl = 0
+    let totalScore = 0, totalStbl = 0
     currTournament.rounds.forEach((round) => {
-      const [roundSkore, roundStbl] = getRoundSkore(player, round.date, scorecards)
-      rowData[round.date + "_skore"] = roundSkore
+      const [roundScore, roundStbl] = getRoundScore(player, round.date, scorecards)
+      rowData[round.date + "_score"] = roundScore
       rowData[round.date + "_stbl"] = roundStbl
-      totalSkore = totalSkore + roundSkore
+      totalScore = totalScore + roundScore
       totalStbl = totalStbl + roundStbl
     });
-    rowData.totalSkore = totalSkore
+    rowData.totalScore = totalScore
     rowData.totalStbl = totalStbl
     resultsTableData.push(rowData);
   });
@@ -207,7 +207,7 @@ export const StablefordStandingsTeams = (props) => {
     let rowData = { "team": team }
     let totalStbl = 0
     tournament.rounds.forEach((round) => {
-      const roundStbl = getTeamRoundSkore(team, round.date, resultsTableData)
+      const roundStbl = getTeamRoundScore(team, round.date, resultsTableData)
       rowData[round.date + "_stbl"] = roundStbl
       totalStbl = totalStbl + roundStbl
     });

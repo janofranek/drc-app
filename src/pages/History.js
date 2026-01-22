@@ -45,8 +45,11 @@ const History = () => {
     return ("Loading...")
   }
 
-  //if there is no non-active tournament, just show basic info
-  if (tournaments.filter(tournament => tournament.active === "0").length === 0) {
+  const archivedTournaments = tournaments
+    .filter(t => !t.status || t.status === 'archive')
+    .sort((a, b) => b.datestart.localeCompare(a.datestart));
+
+  if (archivedTournaments.length === 0) {
     return (
       <>
         <Alert variant="primary" className="v-100">
@@ -62,23 +65,19 @@ const History = () => {
   return (
     <>
       <Accordion>
-        {tournaments.filter(tournament => tournament.active === "0").map((tournament, index) => {
+        {archivedTournaments.map((tournament, index) => {
+          const dateStr = `${tournament.datestart.split('-').reverse().join('.')} - ${tournament.dateend.split('-').reverse().join('.')}`;
           return (
-            <>
-              <Accordion.Item eventKey={index} key={index} >
-                <Accordion.Header>{tournament.id}</Accordion.Header>
-                <Accordion.Body>
-                  <HistoryOneTournament tournament={tournament} matches={matches} />
-                </Accordion.Body>
-              </Accordion.Item>
-            </>
-
+            <Accordion.Item eventKey={index} key={tournament.id} >
+              <Accordion.Header>{tournament.info} ({dateStr})</Accordion.Header>
+              <Accordion.Body>
+                <HistoryOneTournament tournament={tournament} matches={matches} />
+              </Accordion.Body>
+            </Accordion.Item>
           )
         })}
-
       </Accordion>
     </>
-
   )
 }
 
