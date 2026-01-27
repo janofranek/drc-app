@@ -59,10 +59,12 @@ const Layout = () => {
                 }
                 {checkUserAdmin(authEmail, users) &&
                   <NavDropdown title="Admin" id="basic-nav-dropdown">
-                    <NavDropdown.Item as={Link} to="/admin/current-round">Průběžný stav</NavDropdown.Item>
-                    <NavDropdown.Item as={Link} to="/admin/scorecards">Správa skóre</NavDropdown.Item>
-                    <NavDropdown.Item as={Link} to="/admin/tournaments">Správa turnajů</NavDropdown.Item>
                     <NavDropdown.Item as={Link} to="/admin/users">Správa uživatelů</NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/admin/tournaments">Správa turnajů</NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/admin/scorecards">Správa skóre</NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/admin/current-round">Průběžný stav</NavDropdown.Item>
+                    <NavDropdown.Divider />
+                    <NavDropdown.Item as={Link} to="/admin/manual">Nápověda pro správu</NavDropdown.Item>
                   </NavDropdown>
                 }
               </Nav>

@@ -104,6 +104,7 @@ const AdminTournaments = () => {
         users={users}
         courses={courses}
         matches={matches}
+        allTournaments={tournaments}
       />
     </>
   );

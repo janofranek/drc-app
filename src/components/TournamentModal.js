@@ -3,7 +3,7 @@ import { Modal, Button, Tabs, Tab, Row, Col, ListGroup, Form, Accordion, Badge, 
 import { db } from '../cred/firebase';
 import { doc, updateDoc, setDoc, deleteDoc } from "firebase/firestore";
 
-const TournamentModal = ({ show, onHide, tournament, users, courses, matches }) => {
+const TournamentModal = ({ show, onHide, tournament, users, courses, matches, allTournaments }) => {
   const [selectedTab, setSelectedTab] = useState('players');
   const [localPlayers, setLocalPlayers] = useState([]); // Array of user IDs
   const [localTeams, setLocalTeams] = useState([]); // Array of team objects { name: '', players: [] }
@@ -133,6 +133,12 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches }) 
           return;
         }
 
+        // 0. Check SEQUENCE (Must be Round 0 OR Previous Round must be Active)
+        if (index > 0 && !localRounds[index - 1].active) {
+          alert("Nelze aktivovat kolo. Předchozí kolo není aktivní. Aktivace musí probíhat postupně.");
+          return;
+        }
+
         // Check that everyone is assigned exactly ONCE
         const multiple = localPlayers.filter(p => playerCounts[p] > 1);
         if (multiple.length > 0) {
@@ -163,11 +169,17 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches }) 
     }
 
     const newRounds = [...localRounds];
-    newRounds[index] = { ...newRounds[index], [field]: value };
 
-    // Auto-deactivate previous round if activating current
-    if (formData.system === 'rydercup' && field === 'active' && value === true && index > 0) {
-      newRounds[index - 1] = { ...newRounds[index - 1], active: false };
+    if (field === 'active' && value === true) {
+      // Deactivate ALL other rounds
+      newRounds.forEach((r, i) => {
+        if (i !== index) r.active = false;
+      });
+      // Activate current
+      newRounds[index] = { ...newRounds[index], active: true };
+    } else {
+      // Standard update (for unchecking active or changing other fields)
+      newRounds[index] = { ...newRounds[index], [field]: value };
     }
 
     setLocalRounds(newRounds);
@@ -367,6 +379,15 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches }) 
           return;
         }
 
+        if (value === 'actual') {
+          // 0. Check if any OTHER tournament is already active
+          const otherActive = allTournaments && allTournaments.some(t => t.active === true && t.id !== formData.id);
+          if (otherActive) {
+            alert('Již existuje jiný aktivní turnaj. Pro aktivaci tohoto turnaje musíte nejprve ukončit (archivovat) nebo deaktivovat ten současný.');
+            return;
+          }
+        }
+
         if (value === 'actual' && formData.system === 'rydercup') {
           // 2. Check that there are some players chosen
           if (localPlayers.length === 0) {
@@ -444,6 +465,10 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches }) 
             alert("Nelze archivovat. Všechny zápasy musí být uzavřeny (Final).");
             return;
           }
+
+          // Deactivate all rounds
+          const deactivatedRounds = localRounds.map(r => ({ ...r, active: false }));
+          setLocalRounds(deactivatedRounds);
         }
       }
 
