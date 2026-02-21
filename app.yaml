@@ -1,13 +1,11 @@
-runtime: nodejs20
+runtime: nodejs22
 handlers:
 
-  - url: /static
-    static_dir: build/static
-    secure: always
-  - url: /(.*\.(json|ico|js))$
+  - url: /(.*\.(json|ico|js|css|svg|png|jpg|jpeg|txt|map|webmanifest))$
     static_files: build/\1
-    upload: build/.*\.(json|ico|js)$
+    upload: build/.*\.(json|ico|js|css|svg|png|jpg|jpeg|txt|map|webmanifest)$
     secure: always
+
   - url: .*
     static_files: build/index.html
     upload: build/index.html
