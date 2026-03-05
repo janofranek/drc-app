@@ -18,6 +18,7 @@ import AdminScorecards from "./components/AdminScorecards";
 import UsersTable from "./components/UsersTable";
 import CurrentRound from "./components/CurrentRound";
 import AdminTournaments from "./components/AdminTournaments";
+import AdminCourses from "./components/AdminCourses";
 import AdminManual from "./components/AdminManual";
 
 function AppRouter() {
@@ -34,6 +35,7 @@ function AppRouter() {
               <Route index element={<Navigate to="current-round" replace />} />
               <Route path="users" element={<UsersTable />} />
               <Route path="tournaments" element={<AdminTournaments />} />
+              <Route path="courses" element={<AdminCourses />} />
               <Route path="scorecards" element={<AdminScorecards />} />
               <Route path="current-round" element={<CurrentRound />} />
               <Route path="manual" element={<AdminManual />} />
