@@ -36,7 +36,7 @@ const AdminScorecardsTournamentStableford = (props) => {
       const initScorecardId = getScorecardId(props.currRound.date, playerId);
       const playerUser = users.find(user => user.id === playerId);
       if (playerUser) {
-        await createNewScorecard(initScorecardId, playerUser, props.currCourse)
+        await createNewScorecard(initScorecardId, playerUser, props.currCourse, props.currRound.date)
       }
     }));
   }

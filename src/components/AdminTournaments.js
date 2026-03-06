@@ -4,6 +4,7 @@ import { useTournaments } from '../data/TournamentsDataProvider';
 import { useUsers } from '../data/UsersDataProvider';
 import { useCourses } from '../data/CoursesDataProvider';
 import { useMatches } from '../data/MatchesDataProvider';
+import { useScorecards } from '../data/ScorecardsDataProvider';
 import TournamentModal from './TournamentModal';
 
 const AdminTournaments = () => {
@@ -11,11 +12,12 @@ const AdminTournaments = () => {
   const users = useUsers();
   const courses = useCourses();
   const matches = useMatches();
+  const scorecards = useScorecards();
 
   const [selectedTournament, setSelectedTournament] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  if (!tournaments || !users || !courses || !matches) return "Loading...";
+  if (!tournaments || !users || !courses || !matches || !scorecards) return "Loading...";
 
   // Sort by date (newest first)
   const sortedTournaments = [...tournaments].sort((a, b) => {
@@ -104,6 +106,7 @@ const AdminTournaments = () => {
         users={users}
         courses={courses}
         matches={matches}
+        scorecards={scorecards}
         allTournaments={tournaments}
       />
     </>

@@ -59,14 +59,22 @@ const setHoleScore = async (scorecardId, holeNumber, newScore) => {
   await updateDoc(scorecardRef, { holes: newHoles });
 }
 
-const createNewScorecard = async (scorecardId, player, course, force = false) => {
+const createNewScorecard = async (scorecardId, player, course, date, force = false) => {
   const docSnap = await getDoc(doc(db, 'scorecards', scorecardId));
-  //insert only if the scorecard does not already exist
-  if (!docSnap.exists() || force) {
+
+  let shouldOverwrite = !docSnap.exists() || force;
+  if (!shouldOverwrite) {
+    const existingData = docSnap.data();
+    const allZero = existingData.holes && existingData.holes.every(h => h.score === 0);
+    if (allZero) shouldOverwrite = true;
+  }
+
+  if (shouldOverwrite) {
     const playingHCP = getPlayingHCP(player, course);
     const newScorecard = {
       "course": course.id,
       "player": player.id,
+      "date": date,
       "tee": player.tee,
       "playingHCP": playingHCP,
       "holes": []
