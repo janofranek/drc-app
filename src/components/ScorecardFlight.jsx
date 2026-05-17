@@ -3,8 +3,8 @@ import { Accordion, Button } from "react-bootstrap";
 import "./Common.css"
 import { useUsers } from '../data/UsersDataProvider';
 import { useScorecards } from '../data/ScorecardsDataProvider';
-import { ScorecardPlayer } from "./ScorecardPlayer.js"
-import { getScorecardId, setHoleScore } from "../utils/Utils.js"
+import { ScorecardPlayer } from "./ScorecardPlayer.jsx"
+import { getScorecardId, setHoleScore } from "../utils/Utils.jsx"
 
 
 export const ScoreFlightAccHeader = (props) => {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Tabs, Tab, Row, Col, ListGroup, Form, Accordion, Badge, InputGroup, Table } from 'react-bootstrap';
 import { db } from '../cred/firebase';
 import { doc, updateDoc, setDoc, deleteDoc } from "firebase/firestore";
-import { getScorecardId, createNewScorecard } from "../utils/Utils.js";
+import { getScorecardId, createNewScorecard } from "../utils/Utils.jsx";
 
 const TournamentModal = ({ show, onHide, tournament, users, courses, matches, scorecards, allTournaments }) => {
   const [selectedTab, setSelectedTab] = useState('players');

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import "./Common.css"
 import { Modal, Button } from "react-bootstrap";
-import { setMatchScore, getRyderHoleScore } from "../utils/Utils.js"
+import { setMatchScore, getRyderHoleScore } from "../utils/Utils.jsx"
 
 const ModalEditRyderScore = (props) => {
   const [disabledButtons, setDisabledButtons] = useState(false);

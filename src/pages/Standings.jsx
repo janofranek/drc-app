@@ -4,7 +4,7 @@ import { ButtonGroup, ToggleButton } from "react-bootstrap";
 import "../components/Common.css"
 import { useAuth } from '../data/AuthProvider';
 import { useTournaments } from '../data/TournamentsDataProvider';
-import { StablefordStandingsIndividuals, StablefordStandingsTeams } from "../components/StandingsStableford.js"
+import { StablefordStandingsIndividuals, StablefordStandingsTeams } from "../components/StandingsStableford.jsx"
 import NoActiveTournament from "../components/NoActiveTournament"
 import RyderMatchStandings from "../components/StandingsRyderMatch"
 

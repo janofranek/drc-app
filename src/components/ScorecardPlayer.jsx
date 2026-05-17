@@ -3,7 +3,7 @@ import { Table } from "react-bootstrap";
 import "./Common.css"
 import { useUsers } from '../data/UsersDataProvider';
 import { useScorecards } from '../data/ScorecardsDataProvider';
-import { setHoleScore } from "../utils/Utils.js"
+import { setHoleScore } from "../utils/Utils.jsx"
 
 export const InfoPlayer = (props) => {
 

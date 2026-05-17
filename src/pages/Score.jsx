@@ -6,11 +6,11 @@ import { useAuth } from '../data/AuthProvider';
 import { useUsers } from '../data/UsersDataProvider';
 import { useCourses } from '../data/CoursesDataProvider';
 import { useTournaments } from '../data/TournamentsDataProvider';
-import { InfoPlayer, ScorecardPlayer } from "../components/ScorecardPlayer.js"
-import { ScoreFlightTable, ScoreFlightAccHeader, ScoreFlightAccBody } from "../components/ScorecardFlight.js"
-import { ScorecardRyderMatch } from "../components/ScorecardRyderMatch.js"
+import { InfoPlayer, ScorecardPlayer } from "../components/ScorecardPlayer.jsx"
+import { ScoreFlightTable, ScoreFlightAccHeader, ScoreFlightAccBody } from "../components/ScorecardFlight.jsx"
+import { ScorecardRyderMatch } from "../components/ScorecardRyderMatch.jsx"
 import NoActiveTournament from "../components/NoActiveTournament"
-import { getScorecardId, getFlight } from "../utils/Utils.js"
+import { getScorecardId, getFlight } from "../utils/Utils.jsx"
 
 const ScorePlayer = (props) => {
 

@@ -3,7 +3,7 @@ import { Button, Form } from "react-bootstrap";
 import { useUsers } from '../data/UsersDataProvider';
 import { useCourses } from '../data/CoursesDataProvider';
 import { useTournaments } from '../data/TournamentsDataProvider';
-import { getScorecardId, createNewScorecard, resetScorecard } from "../utils/Utils.js";
+import { getScorecardId, createNewScorecard, resetScorecard } from "../utils/Utils.jsx";
 import NoActiveTournament from "./NoActiveTournament";
 
 const AdminScorecardsTournamentUnknown = (props) => {

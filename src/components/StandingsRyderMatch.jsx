@@ -5,7 +5,7 @@ import { useAuth } from '../data/AuthProvider';
 import { useUsers } from '../data/UsersDataProvider';
 import { useMatches } from '../data/MatchesDataProvider';
 import ModalRyderMatch from "./ModalRyderMatch"
-import { getRyderMatchClass, getRyderMatchText, getRyderStandings, formatRyderStatus, checkUserAdmin } from "../utils/Utils.js";
+import { getRyderMatchClass, getRyderMatchText, getRyderStandings, formatRyderStatus, checkUserAdmin } from "../utils/Utils.jsx";
 import logoStt from "../assets/DRCstandard.png"
 import logoLat from "../assets/DRClatin.png"
 

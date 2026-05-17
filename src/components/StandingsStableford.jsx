@@ -3,8 +3,8 @@ import { Table, Modal, Button } from "react-bootstrap";
 import "./Common.css"
 import { useTournaments } from '../data/TournamentsDataProvider';
 import { useScorecards } from '../data/ScorecardsDataProvider';
-import { ScorecardPlayer } from "./ScorecardPlayer.js"
-import { getScorecardId, getRoundScore, getTeamRoundScore } from "../utils/Utils.js"
+import { ScorecardPlayer } from "./ScorecardPlayer.jsx"
+import { getScorecardId, getRoundScore, getTeamRoundScore } from "../utils/Utils.jsx"
 
 const ResultsTableHeaders = (props) => {
   return (

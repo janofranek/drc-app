@@ -1,7 +1,7 @@
 import React from 'react';
 import { Accordion } from "react-bootstrap";
 import { useTournaments } from '../data/TournamentsDataProvider';
-import { ScoreFlightAccHeader, ScoreFlightAccBody } from "./ScorecardFlight.js";
+import { ScoreFlightAccHeader, ScoreFlightAccBody } from "./ScorecardFlight.jsx";
 import NoActiveTournament from "./NoActiveTournament";
 
 const CurrentRoundTournamentUnknown = (props) => {
