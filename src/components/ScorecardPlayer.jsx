@@ -29,7 +29,7 @@ export const InfoPlayer = (props) => {
             <th>P</th>
             <th>Datum</th>
             <th>Skóre</th>
-            <th>Stbl</th>
+            <th>{props.tournamentSystem === 'netto' ? 'Netto' : 'Stbl'}</th>
           </tr>
         </thead>
         <tbody>
@@ -40,7 +40,7 @@ export const InfoPlayer = (props) => {
             <td>{scorecard.playingHCP}</td>
             <td>{roudDate}</td>
             <td className="thick scorecell">{scorecard.holes.reduce((a, v) => a = a + v.score, 0)}</td>
-            <td className="thick scorecell">{scorecard.holes.reduce((a, v) => a = a + v.stableford, 0)}</td>
+            <td className="thick scorecell">{scorecard.holes.reduce((a, v) => a = a + (props.tournamentSystem === 'netto' ? v.netto : v.stableford), 0)}</td>
           </tr>
         </tbody>
       </Table>
@@ -145,9 +145,9 @@ const HoleScore = (props) => {
         <th className="centerrow scorecell" >{props.nineHoles.reduce((a, v) => a = a + v.score, 0)}</th>
       </tr>
       <tr>
-        <td className="leftrow">Stbl</td>
-        {props.nineHoles.map((hole) => { return <td className="centerrow" key={"hole_stbl_" + hole.hole}>{hole.stableford}</td> })}
-        <th className="centerrow">{props.nineHoles.reduce((a, v) => a = a + v.stableford, 0)}</th>
+        <td className="leftrow">{props.tournamentSystem === 'netto' ? 'Netto' : 'Stbl'}</td>
+        {props.nineHoles.map((hole) => { return <td className="centerrow" key={"hole_stbl_" + hole.hole}>{props.tournamentSystem === 'netto' ? hole.netto : hole.stableford}</td> })}
+        <th className="centerrow">{props.nineHoles.reduce((a, v) => a = a + (props.tournamentSystem === 'netto' ? v.netto : v.stableford), 0)}</th>
       </tr>
     </>
   )
@@ -159,7 +159,7 @@ const ScorecardNine = (props) => {
     <>
       <HoleNumbers nine={props.nine} nineHoles={nineHoles} />
       <tbody>
-        <HoleScore nine={props.nine} nineHoles={nineHoles} scorecardId={props.scorecard.id} readOnly={props.readOnly} />
+        <HoleScore nine={props.nine} nineHoles={nineHoles} scorecardId={props.scorecard.id} readOnly={props.readOnly} tournamentSystem={props.tournamentSystem} />
       </tbody>
     </>
   )
@@ -185,8 +185,8 @@ export const ScorecardPlayer = (props) => {
           <col className="scoretablefirstcol" />
           <col span="10" className="scoretablecol" />
         </colgroup>
-        <ScorecardNine nine={1} scorecard={scorecard} readOnly={props.readOnly} />
-        <ScorecardNine nine={2} scorecard={scorecard} readOnly={props.readOnly} />
+        <ScorecardNine nine={1} scorecard={scorecard} readOnly={props.readOnly} tournamentSystem={props.tournamentSystem} />
+        <ScorecardNine nine={2} scorecard={scorecard} readOnly={props.readOnly} tournamentSystem={props.tournamentSystem} />
       </table>
     </>
   )

@@ -10,7 +10,7 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches, sc
   const [localTeams, setLocalTeams] = useState([]); // Array of team objects { name: '', players: [] }
   const [localRounds, setLocalRounds] = useState([]); // Array of round objects
   const [localMatches, setLocalMatches] = useState([]); // Array of RC match objects
-  const [localFlights, setLocalFlights] = useState([]); // Array of Stableford flight objects
+  const [localFlights, setLocalFlights] = useState([]); // Array of Stableford/Netto flight objects
   const [deletedMatches, setDeletedMatches] = useState([]); // Array of match IDs to delete
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -39,9 +39,9 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches, sc
       }
       setLocalMatches(relevantMatches);
 
-      // Load Stableford flights from embedded rounds
+      // Load Stableford/Netto flights from embedded rounds
       let relevantFlights = [];
-      if (tournament.system === 'stableford' && tournament.rounds) {
+      if ((tournament.system === 'stableford' || tournament.system === 'netto') && tournament.rounds) {
         tournament.rounds.forEach(r => {
           if (r.flights) {
             r.flights.forEach((f, idx) => {
@@ -188,8 +188,8 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches, sc
         }
       }
     }
-    // Validation for Stableford Round Active Toggle
-    if (formData.system === 'stableford' && field === 'active') {
+    // Validation for Stableford/Netto Round Active Toggle
+    if ((formData.system === 'stableford' || formData.system === 'netto') && field === 'active') {
       const roundDate = localRounds[index].date;
       const dayFlights = localFlights.filter(f => f.date === roundDate);
 
@@ -220,12 +220,13 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches, sc
 
         const unassigned = localPlayers.filter(p => !allFlightPlayers.includes(p));
         if (unassigned.length > 0) {
-          alert(`Nelze aktivovat kolo. Někteří hráči nejsou zařazeni do žádného flightu (${unassigned.length}).`);
-          return;
+          if (!window.confirm(`Někteří hráči nejsou zařazeni do žádného flightu (${unassigned.length}). Chcete přesto kolo aktivovat?`)) {
+            return;
+          }
         }
 
         if (missingHcpCount > 0) {
-          alert(`Nelze aktivovat kolo. ${missingHcpCount} hráčům chybí nastavený HCP a je pro Stableford vyžadován.`);
+          alert(`Nelze aktivovat kolo. ${missingHcpCount} hráčům chybí nastavený HCP a je pro tento formát vyžadován.`);
           return;
         }
       }
@@ -252,10 +253,10 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches, sc
 
   const handleAddPlayer = (userId) => {
     if (!localPlayers.includes(userId)) {
-      if (formData.system === 'stableford') {
+      if (formData.system === 'stableford' || formData.system === 'netto') {
         const playerObj = users.find(u => u.id === userId);
         if (playerObj && (playerObj.hcp === undefined || playerObj.hcp === null || playerObj.hcp === '')) {
-          if (!window.confirm(`Hráč ${playerObj.name} nemá zadaný handicap. Ve Stableford turnaji je handicap vyžadován k výpočtům. Chcete jej přesto přidat?`)) {
+          if (!window.confirm(`Hráč ${playerObj.name} nemá zadaný handicap. V tomto formátu je handicap vyžadován k výpočtům. Chcete jej přesto přidat?`)) {
             return;
           }
         }
@@ -350,7 +351,7 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches, sc
     setLocalMatches([...localMatches, newMatch]);
   };
 
-  // --- FLIGHTS LOGIC (Stableford) ---
+  // --- FLIGHTS LOGIC (Stableford/Netto) ---
   const handleAddFlight = (roundDate) => {
     let maxSuffix = -1;
     localFlights.filter(f => f.date === roundDate).forEach(f => {
@@ -440,9 +441,9 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches, sc
     }
 
     try {
-      // 1. Process Flights into Rounds (for Stableford)
+      // 1. Process Flights into Rounds (for Stableford/Netto)
       const roundsToSave = localRounds.map(r => {
-        if (formData.system === 'stableford') {
+        if (formData.system === 'stableford' || formData.system === 'netto') {
           const roundFlights = localFlights
             .filter(f => f.date === r.date)
             .map(f => ({ players: f.players || [] }));
@@ -482,8 +483,8 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches, sc
         await deleteDoc(doc(db, "matches", matchId));
       }
 
-      // 5. Stableford Scorecards Generation
-      if (formData.system === 'stableford') {
+      // 5. Stableford/Netto Scorecards Generation
+      if (formData.system === 'stableford' || formData.system === 'netto') {
         const activeRounds = localRounds.filter(r => r.active);
         for (const round of activeRounds) {
           if (!round.course) continue;
@@ -547,7 +548,7 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches, sc
         alert(`Všichni hráči musí být v týmu. Nepřiřazení hráči: ${unassignedPlayers.length}`);
         return false;
       }
-    } else if (formData.system === 'stableford') {
+    } else if (formData.system === 'stableford' || formData.system === 'netto') {
       const allAssignedPlayers = localTeams.flatMap(t => t.players || []);
       const uniqueAssignedPlayers = new Set(allAssignedPlayers);
 
@@ -558,8 +559,9 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches, sc
 
       const unassignedPlayers = localPlayers.filter(p => !uniqueAssignedPlayers.has(p));
       if (unassignedPlayers.length > 0) {
-        alert(`Všichni hráči musí být v týmu. Nepřiřazení hráči: ${unassignedPlayers.length}`);
-        return false;
+        if (!window.confirm(`Všichni hráči nejsou v týmu (nepřiřazeno: ${unassignedPlayers.length}). Chcete přesto turnaj aktivovat?`)) {
+          return false;
+        }
       }
     }
 
@@ -661,7 +663,7 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches, sc
 
     if (currentStatus === 'actual') {
       if (formData.system === 'rydercup') return validateRyderCupDeactivation(nextStatus);
-      if (formData.system === 'stableford') return validateStablefordDeactivation(nextStatus);
+      if (formData.system === 'stableford' || formData.system === 'netto') return validateStablefordDeactivation(nextStatus);
     }
 
     if (currentStatus === 'archive') {
@@ -796,6 +798,7 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches, sc
                 >
                   <option value="rydercup">Ryder Cup</option>
                   <option value="stableford">Stableford</option>
+                  <option value="netto">Netto</option>
                 </Form.Select>
               </Form.Group>
               <Form.Group className="mb-3">
@@ -1057,7 +1060,7 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches, sc
             </Accordion>
           </Tab>
 
-          <Tab eventKey="rounds_st" title={`Kola - Stableford (${localRounds.length})`} disabled={formData.system !== 'stableford'}>
+          <Tab eventKey="rounds_st" title={`Kola - Stableford/Netto (${localRounds.length})`} disabled={formData.system !== 'stableford' && formData.system !== 'netto'}>
             <Accordion>
               {localRounds.map((round, index) => (
                 <Accordion.Item eventKey={index.toString()} key={index}>

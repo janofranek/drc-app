@@ -109,7 +109,6 @@ const UserModal = (props) => {
               <Form.Select name="tee" value={formData.tee} onChange={handleChange}>
                 <option value="yellow">Žlutá</option>
                 <option value="white">Bílá</option>
-                <option value="blue">Modrá</option>
               </Form.Select>
             </Form.Group>
             <Form.Group as={Col} className="d-flex align-items-center" controlId="formGridAdmin">

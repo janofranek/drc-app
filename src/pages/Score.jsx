@@ -16,8 +16,8 @@ const ScorePlayer = (props) => {
 
   return (
     <>
-      <InfoPlayer scorecardId={props.scorecardId} />
-      <ScorecardPlayer scorecardId={props.scorecardId} />
+      <InfoPlayer scorecardId={props.scorecardId} tournamentSystem={props.tournamentSystem} />
+      <ScorecardPlayer scorecardId={props.scorecardId} tournamentSystem={props.tournamentSystem} />
     </>
   )
 }
@@ -30,14 +30,12 @@ const ScoreFlight = (props) => {
     <>
       <ScoreFlightTable currentFlight={currentFlight} currentRound={props.currentRound} />
       <Accordion>
-        {currentFlight.map((player, index) => {
+        {currentFlight.filter(Boolean).map((player, index) => {
           return (
-            <>
-              <Accordion.Item eventKey={index} key={index} >
-                <ScoreFlightAccHeader player={player} currentRound={props.currentRound} />
-                <ScoreFlightAccBody player={player} currentRound={props.currentRound} />
-              </Accordion.Item>
-            </>
+            <Accordion.Item eventKey={index} key={player} >
+              <ScoreFlightAccHeader player={player} currentRound={props.currentRound} tournamentSystem={props.tournamentSystem} />
+              <ScoreFlightAccBody player={player} currentRound={props.currentRound} tournamentSystem={props.tournamentSystem} />
+            </Accordion.Item>
           )
         })}
       </Accordion>
@@ -92,7 +90,7 @@ const ScoreTournamentStableford = (props) => {
         ))}
       </ButtonGroup>
 
-      {(radioValue === "1" ? <ScorePlayer scorecardId={scorecardId} /> : <ScoreFlight currentUser={props.currentUser} currentRound={props.currentRound} />)}
+      {(radioValue === "1" ? <ScorePlayer scorecardId={scorecardId} tournamentSystem={props.tournamentSystem} /> : <ScoreFlight currentUser={props.currentUser} currentRound={props.currentRound} tournamentSystem={props.tournamentSystem} />)}
     </div>
   )
 
@@ -132,9 +130,10 @@ const Score = () => {
   const tournamentId = currTournament.id;
   const currentRound = currTournament.rounds.filter(round => round.active)[0]
 
-  if (tournamentSystem === "stableford") {
+  if (tournamentSystem === "stableford" || tournamentSystem === "netto") {
     return (<ScoreTournamentStableford
       tournamentId={tournamentId}
+      tournamentSystem={tournamentSystem}
       currentRound={currentRound}
       currentUser={currentUser}
     />)

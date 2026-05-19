@@ -19,7 +19,7 @@ export const ScoreFlightAccHeader = (props) => {
   const scorecard = scorecards.filter(s => s.id === scorecardId)[0];
 
   const score = scorecard.holes.reduce((a, v) => a = a + v.score, 0)
-  const stbl = scorecard.holes.reduce((a, v) => a = a + v.stableford, 0)
+  const stbl = scorecard.holes.reduce((a, v) => a = a + (props.tournamentSystem === 'netto' ? v.netto : v.stableford), 0)
 
   return (
     <Accordion.Header>
@@ -28,12 +28,12 @@ export const ScoreFlightAccHeader = (props) => {
           <col className="acctablecolname" />
           <col className="acctablecolscore" />
         </colgroup>
-        <theader>
+        <thead>
           <tr>
             <th className="acctablecolname">{props.player}</th>
             <th className="acctablecolscore">{score} / {stbl}</th>
           </tr>
-        </theader>
+        </thead>
       </table>
     </Accordion.Header>
   )
@@ -43,7 +43,7 @@ export const ScoreFlightAccBody = (props) => {
   const scorecardId = getScorecardId(props.currentRound.date, props.player)
   return (
     <Accordion.Body>
-      <ScorecardPlayer scorecardId={scorecardId} readOnly={props.readOnly} />
+      <ScorecardPlayer scorecardId={scorecardId} readOnly={props.readOnly} tournamentSystem={props.tournamentSystem} />
     </Accordion.Body>
   )
 }
@@ -88,14 +88,14 @@ const ScoreFlightCell = (props) => {
 
   return (
     <td>
-      <label for={"score" + props.data.short}>{props.data.short}</label><br />
+      <label htmlFor={"score" + props.data.short}>{props.data.short}</label><br />
       <input type="tel"
         className="flightscoreinput"
         id={props.data.scorecardId + "/" + props.holeSelect}
         name={props.data.scorecardId + "/" + props.holeSelect}
         key={props.data.scorecardId + "/" + props.holeSelect}
         size="3"
-        maxlength="2"
+        maxLength="2"
         min="0"
         max="99"
         onBlur={handleBlur}
@@ -143,13 +143,21 @@ export const ScoreFlightTable = (props) => {
 
   const flightData = {};
   props.currentFlight.forEach(player => {
+    if (!player) return; // Skip empty slots
     const scorecardId = getScorecardId(props.currentRound.date, player)
+    const user = users.find(u => u.id === player);
+    if (!user) return; // Safety check if user somehow missing
+
     let data = {}
     data.scorecardId = scorecardId
     data.playerId = player
-    data.short = users.filter(u => u.id === player)[0].short
-    data.scorecard = scorecards.filter(s => s.id === scorecardId)[0]
-    flightData[data.short] = data
+    data.short = user.short
+    data.scorecard = scorecards.find(s => s.id === scorecardId)
+    
+    // Only add if scorecard was found
+    if (data.scorecard) {
+      flightData[data.short] = data
+    }
   });
 
   return (
@@ -164,20 +172,20 @@ export const ScoreFlightTable = (props) => {
               <Button variant="primary" onClick={onButtonLeft}>&lt;&lt;</Button>
             </td>
             <td>
-              <label for="holeSelect" className="thick">Jamka</label><br />
+              <label htmlFor="holeSelect" className="thick">Jamka</label><br />
               <input type="tel"
                 className="flightscoreinput thick"
                 id="holeSelect"
                 name="holeSelect"
-                maxlength="2"
+                maxLength="2"
                 min="1"
                 max="18"
                 value={holeSelect}
                 required
-                readonly
+                readOnly
                 onChange={onSelectChange} />
             </td>
-            {Object.keys(flightData).map((key) => { return <ScoreFlightCell holeSelect={holeSelect} data={flightData[key]} formData={formData} setFormData={setFormData} /> })}
+            {Object.keys(flightData).map((key) => { return <ScoreFlightCell key={key} holeSelect={holeSelect} data={flightData[key]} formData={formData} setFormData={setFormData} /> })}
             <td>
               <Button variant="primary" onClick={onButtonRight}>&gt;&gt;</Button>
             </td>

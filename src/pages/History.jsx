@@ -6,6 +6,7 @@ import { useAuth } from '../data/AuthProvider';
 import { useTournaments } from '../data/TournamentsDataProvider';
 import { useMatches } from "../data/MatchesDataProvider"
 import { StablefordStandingsIndividuals, StablefordStandingsTeams } from "../components/StandingsStableford"
+import { NettoStandingsIndividuals, NettoStandingsTeams } from "../components/StandingsNetto"
 import { RyderMatchStandingsTotal, RyderMatchStandingsDetail } from "../components/StandingsRyderMatch"
 
 const HistoryOneTournament = (props) => {
@@ -15,6 +16,13 @@ const HistoryOneTournament = (props) => {
       <>
         <StablefordStandingsIndividuals tournamentId={props.tournament.id} />
         <StablefordStandingsTeams tournamentId={props.tournament.id} />
+      </>
+    )
+  } else if (props.tournament.system === "netto") {
+    return (
+      <>
+        <NettoStandingsIndividuals tournamentId={props.tournament.id} />
+        <NettoStandingsTeams tournamentId={props.tournament.id} />
       </>
     )
   } else if (props.tournament.system === "rydercup") {

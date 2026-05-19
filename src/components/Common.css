@@ -46,6 +46,7 @@ body {
   width: 15px;
   background-color: yellow;
   border-radius: 50%;
+  border: 1px solid black;
   display: inline-block;
 }
 
@@ -54,6 +55,7 @@ body {
   width: 15px;
   background-color: white;
   border-radius: 50%;
+  border: 1px solid black;
   display: inline-block;
 }
 

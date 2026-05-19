@@ -50,12 +50,27 @@ const getStableford = (hole) => {
   return getStableford2(hole.score, hole.par, hole.shots)
 }
 
+const getNetto2 = (score, par, shots) => {
+  if (score === 0) {
+    return 0
+  } else if (score > par + 5) {
+    return par + 5 - shots
+  } else {
+    return score - shots
+  }
+}
+
+const getNetto = (hole) => {
+  return getNetto2(hole.score, hole.par, hole.shots)
+}
+
 const setHoleScore = async (scorecardId, holeNumber, newScore) => {
   const scorecardRef = doc(db, "scorecards", scorecardId);
   const scorecardSnap = await getDoc(scorecardRef);
   let newHoles = [...scorecardSnap.data().holes]
   newHoles[holeNumber - 1].score = Number(newScore)
   newHoles[holeNumber - 1].stableford = getStableford(newHoles[holeNumber - 1])
+  newHoles[holeNumber - 1].netto = getNetto(newHoles[holeNumber - 1])
   await updateDoc(scorecardRef, { holes: newHoles });
 }
 
@@ -86,7 +101,8 @@ const createNewScorecard = async (scorecardId, player, course, date, force = fal
           "par": hole.par,
           "shots": getHoleShots(hole.index, playingHCP),
           "score": 0,
-          "stableford": 0
+          "stableford": 0,
+          "netto": 0
         }
       )
     })
@@ -109,13 +125,15 @@ const resetScorecard = async (scorecardId, player, course, tee = null) => {
     docSnap.data().holes.forEach((hole, index) => {
       const shots = getHoleShots(course.holes[index].index, playingHCP)
       const stbl = getStableford2(hole.score, hole.par, shots)
+      const netto = hole.score === 0 ? 0 : getNetto2(hole.score, hole.par, shots)
       updateScorecard.holes.push(
         {
           "hole": hole.hole,
           "par": hole.par,
           "shots": shots,
           "score": hole.score,
-          "stableford": stbl
+          "stableford": stbl,
+          "netto": netto
         }
       )
     })
@@ -136,6 +154,19 @@ const getRoundScore = (player, date, scorecards) => {
   }
 }
 
+const getNettoRoundScore = (player, date, scorecards) => {
+  const scorecardId = date + " " + player
+  const scorecard = scorecards.filter(sc => sc.id === scorecardId)
+  if (scorecard.length === 0) {
+    return [0, 0] // score, netto
+  } else {
+    return [
+      scorecard[0].holes.reduce((a, v) => a = a + v.score, 0),
+      scorecard[0].holes.reduce((a, v) => a = a + v.netto, 0),
+    ]
+  }
+}
+
 const getTeamRoundScore = (team, date, resultsTable) => {
   let roundStbl = [];
   team.players.forEach(player => {
@@ -145,6 +176,18 @@ const getTeamRoundScore = (team, date, resultsTable) => {
   roundStbl.sort((a, b) => b - a)
   //take two out of three scores
   return roundStbl[0] + roundStbl[1]
+}
+
+const getNettoTeamRoundScore = (team, date, resultsTable) => {
+  let roundNetto = [];
+  team.players.forEach(player => {
+    const playerRow = resultsTable.filter(r => r.player === player)[0]
+    if (playerRow && playerRow[date + "_netto"] !== undefined) {
+      roundNetto.push(playerRow[date + "_netto"])
+    }
+  })
+  // Sum of all players for Netto Team Standings
+  return roundNetto.reduce((a, v) => a + v, 0)
 }
 
 const getFlight = (currentUser, currentRound) => {
@@ -410,7 +453,7 @@ const sendUserPasswordReset = async (email) => {
 
 export {
   getScorecardId, getPlayingHCP, getHolesHCP, getHoleShots, setHoleScore, getRyderStandings,
-  getRoundScore, getTeamRoundScore, getFlight, createNewScorecard, resetScorecard, getRyderHoleClass,
+  getRoundScore, getNettoRoundScore, getTeamRoundScore, getNettoTeamRoundScore, getFlight, createNewScorecard, resetScorecard, getRyderHoleClass,
   getRyderHoleScore, getRyderMatchClass, getRyderMatchText, setMatchScore, formatRyderStatus,
   checkUserAdmin, getLastRyderMatch, createUser, updateUser, deleteUser, sendUserPasswordReset
 }

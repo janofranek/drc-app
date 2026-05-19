@@ -5,6 +5,7 @@ import "../components/Common.css"
 import { useAuth } from '../data/AuthProvider';
 import { useTournaments } from '../data/TournamentsDataProvider';
 import { StablefordStandingsIndividuals, StablefordStandingsTeams } from "../components/StandingsStableford.jsx"
+import { NettoStandingsIndividuals, NettoStandingsTeams } from "../components/StandingsNetto.jsx"
 import NoActiveTournament from "../components/NoActiveTournament"
 import RyderMatchStandings from "../components/StandingsRyderMatch"
 
@@ -52,6 +53,42 @@ const StandingsTournamentStableford = (props) => {
   )
 }
 
+const StandingsTournamentNetto = (props) => {
+  const [radioValue, setRadioValue] = useState('1');
+
+  const radios = [
+    { name: 'Jednotlivci', value: '1' },
+    { name: 'Týmy', value: '2' }
+  ];
+
+  return (
+    <div>
+      <ButtonGroup>
+        {radios.map((radio, idx) => (
+          <ToggleButton
+            key={idx}
+            id={`radio-netto-${idx}`}
+            type="radio"
+            variant="outline-primary"
+            size="sm"
+            name="radio"
+            value={radio.value}
+            checked={radioValue === radio.value}
+            onChange={(e) => setRadioValue(e.currentTarget.value)}
+          >
+            {radio.name}
+          </ToggleButton>
+        ))}
+      </ButtonGroup>
+
+      {(radioValue === "1"
+        ? <NettoStandingsIndividuals tournamentId={props.tournamentId} />
+        : <NettoStandingsTeams tournamentId={props.tournamentId} />)}
+
+    </div>
+  )
+}
+
 const Standings = () => {
 
   //load data
@@ -81,6 +118,8 @@ const Standings = () => {
 
   if (tournamentSystem === "stableford") {
     return (<StandingsTournamentStableford tournamentId={tournamentId} />)
+  } else if (tournamentSystem === "netto") {
+    return (<StandingsTournamentNetto tournamentId={tournamentId} />)
   } else if (tournamentSystem === "rydercup") {
     return (<RyderMatchStandings tournament={currTournament} />)
   } else {

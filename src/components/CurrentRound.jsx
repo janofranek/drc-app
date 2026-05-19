@@ -28,8 +28,8 @@ const CurrentRoundTournamentStableford = (props) => {
         {props.currTournament.players.map((player, index) => {
           return (
             <Accordion.Item eventKey={index} key={index} >
-              <ScoreFlightAccHeader player={player} currentRound={props.currRound} />
-              <ScoreFlightAccBody player={player} currentRound={props.currRound} />
+              <ScoreFlightAccHeader player={player} currentRound={props.currRound} tournamentSystem={props.currTournament.system} />
+              <ScoreFlightAccBody player={player} currentRound={props.currRound} tournamentSystem={props.currTournament.system} />
             </Accordion.Item>
           )
         })}
@@ -59,7 +59,7 @@ const CurrentRound = () => {
   const tournamentId = currTournament.id;
   const currRound = currTournament.rounds.filter(round => round.active)[0];
 
-  if (tournamentSystem === "stableford") {
+  if (tournamentSystem === "stableford" || tournamentSystem === "netto") {
     return (<CurrentRoundTournamentStableford currTournament={currTournament} currRound={currRound} />)
   } else if (tournamentSystem === "rydercup") {
     return (<CurrentRoundTournamentRyderCup tournamentId={tournamentId} />)

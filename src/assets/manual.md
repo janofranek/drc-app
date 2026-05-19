@@ -8,7 +8,7 @@ V této příručce naleznete postup pro správu turnajů v aplikaci.
 
 V sekci **Admin > Správa uživatelů** můžete spravovat seznam hráčů a uživatelů aplikace.
 
-- **Vytvoření uživatele:** Klikněte na zelené tlačítko *+ Přidat uživatele*. Povinné údaje jsou email, jméno. Další jsou nepovinné - HCP je ale potřeba pro Stableford turnaje. Nový hráč se pak v aplikaci musí zaregistrovat a nastavit si své heslo.
+- **Vytvoření uživatele:** Klikněte na zelené tlačítko *+ Přidat uživatele*. Povinné údaje jsou email, jméno. Další jsou nepovinné - HCP a odpaliště je ale potřeba pro Stableford a Netto turnaje. Nový hráč se pak v aplikaci musí zaregistrovat a nastavit si své heslo.
 - **Úprava uživatele:** Klikněte na modré tlačítko *Upravit* u konkrétního uživatele.
 - **Reset hesla:** Klikněte na žluté tlačítko *Reset hesla*. Uživateli přijde na email odkaz pro nastavení nového hesla.
 - **Smazání uživatele:** Klikněte na červené tlačítko *Smazat*. Pozor, smazání je nevratné.
@@ -17,7 +17,7 @@ V sekci **Admin > Správa uživatelů** můžete spravovat seznam hráčů a už
 
 ## 2. Správa hřišť
 
-V sekci **Admin > Správa hřišť** můžete spravovat seznam hřišť a jejich parametrů. Tato data se používají pouze pro turnaje typu Stableford. Pro Ryder Cup se nepoužívají.
+V sekci **Admin > Správa hřišť** můžete spravovat seznam hřišť a jejich parametrů. Tato data se používají pouze pro turnaje typu Stableford a Netto. Pro Ryder Cup se nepoužívají.
 
 - **Vytvoření hřiště:** Klikněte na zelené tlačítko *+ Přidat hřiště*. Vyplňte název hřiště a další údaje - celkový par, pro jednotlivé jamky jejich par a handicap a pak pro jednotlivá odpaliště CR (course rating) a SR (slope rating).
 - **Úprava hřiště:** Klikněte na modré tlačítko *Upravit* u konkrétního hřiště.
@@ -34,7 +34,7 @@ V sekci **Admin > Správa turnajů**:
     - **ID turnaje:** Unikátní identifikátor (např. `2026-rydercup`).
     - **Název:** Název zobrazený v hlavičce (např. *Ryder Cup 2026*).
     - **Datum od/do:** Rozmezí trvání turnaje.
-    - **Systém:** Zvolte *Ryder Cup* nebo *Stableford*.
+    - **Systém:** Zvolte *Ryder Cup*, *Stableford* nebo *Netto*.
     - **Stav:** Ponechte *Připravuje se*.
 
 > Turnaj nelze přepnout na *Aktuální*, dokud nejsou nastaveni hráči, týmy a kola.
@@ -51,11 +51,12 @@ V detailu turnaje (tlačítko *Spravovat*):
 
 **Záložka "Týmy"**
 - Pro Ryder Cup jsou automaticky vytvořeny týmy **Standard** a **Latin**.
-- Pro Stableford je potřeba vytvořit týmy ručně. Klikněte na zelené tlačítko *+ Přidat tým* a vyplňte název týmu.
+- Pro Stableford a Netto je potřeba vytvořit týmy ručně. Klikněte na zelené tlačítko *+ Přidat tým* a vyplňte název týmu.
 - Rozklikněte tým a pomocí výběrového pole *+ Přidat člena...* přiřaďte hráče do týmu.
 - **Pravidla:**
-    - Každý hráč musí být v právě jednom týmu.
-    - Týmy musí mít stejný počet hráčů.
+    - Pro Ryder Cup: Každý hráč musí být v právě jednom týmu.
+    - Pro Stableford a Netto: Pro případ nevhodného počtu hráčů je možné nechat některé hráče bez týmu.
+    - Týmy musí mít vždy stejný počet hráčů.
 
 ---
 
@@ -75,9 +76,9 @@ Kola se generují automaticky podle délky turnaje (Datum od - do).
 
 ---
 
-## 6. Nastavení kol - Stableford
+## 6. Nastavení kol - Stableford a Netto
 
-**Záložka "Kola - Stableford"**
+**Záložka "Kola - Stableford/Netto"**
 Kola se generují automaticky podle délky turnaje (Datum od - do).
 
 - **Nastavení kola:** Pro každé kolo je potřeba vybrat hřiště a pak zadat flighty. Pokud někteří hráči hrají z jiných odpališť, je potřeba nastavit pro každého hráče jeho odpaliště ve Správě uživatelů. 
@@ -86,6 +87,7 @@ Kola se generují automaticky podle délky turnaje (Datum od - do).
 **Flighty v kole**
 - V sekci kola klikněte na *+ Přidat flight*.
 - Vyberte hráče do flightu (1-4 hráči).
+- Pokud některý hráč některý den nehraje, je možné jej nezařadit do flightu
 
 ---
 
@@ -95,12 +97,13 @@ Jakmile máte vše nastaveno:
 
 1. V záložce **Základní údaje** změňte Stav na **Aktuální**.
 2. Pokud aplikace nahlásí chybu, zkontrolujte:
-    - Zda jsou všichni hráči v týmech.
+    - Zda jsou všichni hráči v týmech (pro Stableford a Netto je tam je varování, které lze ignorovat).
     - Zda je počet hráčů v týmech stejný.
     - Zda **není aktivní jiný turnaj** (systém povolí max. 1 aktivní turnaj).
 
 Během hry:
 - Na záložce *Kola* přepínejte aktivní kolo podle aktuálního dne.
+- Pokud je některý hráč nezařazený do flightu, aplikace na to upozorní, ale lze to ignorovat (např. pokud hráč v daný den nehraje).
 - Skóre se zadává v sekci *Admin > Správa skóre* (nebo hráči sami, pokud mají oprávnění).
 
 Po skončení turnaje změňte Stav na **Archiv**. Tím se automaticky deaktivují všechna kola.

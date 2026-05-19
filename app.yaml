@@ -1,4 +1,7 @@
 runtime: nodejs22
+
+automatic_scaling:
+  max_instances: 1
 handlers:
 
   - url: /(.*\.(json|ico|js|css|svg|png|jpg|jpeg|txt|map|webmanifest))$

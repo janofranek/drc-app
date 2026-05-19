@@ -124,7 +124,7 @@ const AdminScorecards = () => {
   const currCourse = courses.filter(course => course.id === currRound.course)[0];
 
 
-  if (tournamentSystem === "stableford") {
+  if (tournamentSystem === "stableford" || tournamentSystem === "netto") {
     return (<AdminScorecardsTournamentStableford currTournament={currTournament} currRound={currRound} currCourse={currCourse} />)
   } else if (tournamentSystem === "rydercup") {
     return (<AdminScorecardsTournamentRyderCup tournamentId={tournamentId} />)
