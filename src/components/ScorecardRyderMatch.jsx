@@ -3,6 +3,8 @@ import "./Common.css"
 import { useMatches } from '../data/MatchesDataProvider';
 import ModalEditRyderScore from "./ModalEditRyderScore"
 import { getRyderHoleClass, getRyderMatchClass, getRyderMatchText } from "../utils/Utils"
+import logoStt from "../assets/DRCstandard.png"
+import logoLat from "../assets/DRClatin.png"
 
 const InfoMatch = (props) => {
 
@@ -12,13 +14,27 @@ const InfoMatch = (props) => {
         <table className="scoretable">
           <tbody>
             <tr>
-              <td className="stt-final pad-left-right">{props.match.players_stt.join(" + ")}</td>
+              <td className="stt-final pad-left-right">
+                <img 
+                  src={logoStt} 
+                  alt="STT" 
+                  style={{ width: "32px", height: "32px", marginRight: "8px", objectFit: "contain", verticalAlign: "middle" }} 
+                />
+                <span style={{ verticalAlign: "middle" }}>{props.match.players_stt.join(" + ")}</span>
+              </td>
               <td rowSpan={2} className='centerrow'>
                 <div className={getRyderMatchClass(props.match)}>{getRyderMatchText(props.match)}</div>
               </td>
             </tr>
             <tr>
-              <td className="lat-final pad-left-right">{props.match.players_lat.join(" + ")}</td>
+              <td className="lat-final pad-left-right">
+                <img 
+                  src={logoLat} 
+                  alt="LAT" 
+                  style={{ width: "32px", height: "32px", marginRight: "8px", objectFit: "contain", verticalAlign: "middle" }} 
+                />
+                <span style={{ verticalAlign: "middle" }}>{props.match.players_lat.join(" + ")}</span>
+              </td>
             </tr>
           </tbody>
         </table>

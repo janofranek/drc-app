@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Tabs, Tab, Row, Col, ListGroup, Form, Accordion, Badge, InputGroup, Table } from 'react-bootstrap';
-import { db } from '../cred/firebase';
-import { doc, updateDoc, setDoc, deleteDoc } from "firebase/firestore";
+import { db, storage } from '../cred/firebase';
+import { doc, updateDoc, setDoc, deleteDoc, collection, addDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useFirestoreCollection } from '../hooks/useFirestoreCollection';
 import { getScorecardId, createNewScorecard } from "../utils/Utils.jsx";
 
 const TournamentModal = ({ show, onHide, tournament, users, courses, matches, scorecards, allTournaments }) => {
@@ -13,6 +15,13 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches, sc
   const [localFlights, setLocalFlights] = useState([]); // Array of Stableford/Netto flight objects
   const [deletedMatches, setDeletedMatches] = useState([]); // Array of match IDs to delete
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Storage and Firestore Logo States
+  const existingLogos = useFirestoreCollection("logos") || [];
+  const [uploadModeTeams, setUploadModeTeams] = useState({});
+  const [newLogoNames, setNewLogoNames] = useState({});
+  const [logoFiles, setLogoFiles] = useState({});
+  const [uploadingTeams, setUploadingTeams] = useState({});
 
   const [formData, setFormData] = useState({
     id: '',
@@ -306,6 +315,85 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches, sc
     const newTeams = [...localTeams];
     newTeams[teamIndex].players = newTeams[teamIndex].players.filter(id => id !== userId);
     setLocalTeams(newTeams);
+  };
+
+  // --- LOGO LOGIC ---
+  const handleTeamLogoChange = (index, logoUrl) => {
+    const newTeams = [...localTeams];
+    if (logoUrl === "upload_new") {
+      setUploadModeTeams(prev => ({ ...prev, [index]: true }));
+      setNewLogoNames(prev => ({ ...prev, [index]: newTeams[index].name || "" }));
+    } else {
+      setUploadModeTeams(prev => ({ ...prev, [index]: false }));
+      if (logoUrl === "") {
+        const updatedTeams = newTeams.map((t, idx) => {
+          if (idx === index) {
+            const { logoUrl: _, ...rest } = t;
+            return rest;
+          }
+          return t;
+        });
+        setLocalTeams(updatedTeams);
+      } else {
+        newTeams[index].logoUrl = logoUrl;
+        setLocalTeams(newTeams);
+      }
+    }
+  };
+
+  const handleFileChange = (index, file) => {
+    setLogoFiles(prev => ({ ...prev, [index]: file }));
+  };
+
+  const handleUploadLogo = async (index) => {
+    const file = logoFiles[index];
+    const logoName = newLogoNames[index] || localTeams[index].name || "Nové logo";
+
+    if (!file) {
+      alert("Vyberte prosím soubor s obrázkem!");
+      return;
+    }
+
+    try {
+      setUploadingTeams(prev => ({ ...prev, [index]: true }));
+
+      // 1. Generate unique file name in Storage
+      const fileExtension = file.name.split('.').pop();
+      const uniqueFilename = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
+      const logoRef = ref(storage, `logos/${uniqueFilename}`);
+
+      // 2. Upload file
+      await uploadBytes(logoRef, file);
+
+      // 3. Get download URL
+      const downloadUrl = await getDownloadURL(logoRef);
+
+      // 4. Save to Firestore collection "logos"
+      const logosCollectionRef = collection(db, "logos");
+      await addDoc(logosCollectionRef, {
+        name: logoName,
+        url: downloadUrl,
+        filename: uniqueFilename,
+        createdAt: new Date().toISOString()
+      });
+
+      // 5. Update localTeams with new logo URL
+      const newTeams = [...localTeams];
+      newTeams[index].logoUrl = downloadUrl;
+      setLocalTeams(newTeams);
+
+      // 6. Reset upload states
+      setUploadModeTeams(prev => ({ ...prev, [index]: false }));
+      setNewLogoNames(prev => ({ ...prev, [index]: "" }));
+      setLogoFiles(prev => ({ ...prev, [index]: null }));
+
+      alert("Logo bylo úspěšně nahráno a přiřazeno k týmu.");
+    } catch (error) {
+      console.error("Chyba při nahrávání loga:", error);
+      alert("Nepodařilo se nahrát logo: " + error.message);
+    } finally {
+      setUploadingTeams(prev => ({ ...prev, [index]: false }));
+    }
   };
 
   // --- MATCHES LOGIC ---
@@ -881,6 +969,84 @@ const TournamentModal = ({ show, onHide, tournament, users, courses, matches, sc
                             <Button variant="danger" className="ms-2" onClick={() => handleDeleteTeam(index)}>Smazat</Button>
                           }
                         </div>
+                      </Col>
+                    </Row>
+
+                    <Row className="mb-3">
+                      <Col md={12}>
+                        <Form.Label>Logo týmu</Form.Label>
+                        
+                        <div className="d-flex align-items-center mb-2 border p-2 rounded bg-white">
+                          <div className="me-3 border rounded d-flex align-items-center justify-content-center bg-light" style={{ width: "60px", height: "60px", overflow: "hidden" }}>
+                            {team.logoUrl ? (
+                              <img src={team.logoUrl} alt={`Logo ${team.name}`} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                            ) : (
+                              <span className="text-muted small text-center px-1">Bez loga</span>
+                            )}
+                          </div>
+                          
+                          <div className="flex-grow-1">
+                            {canEditStructure ? (
+                              <Form.Select
+                                value={uploadModeTeams[index] ? "upload_new" : (team.logoUrl || "")}
+                                onChange={(e) => handleTeamLogoChange(index, e.target.value)}
+                                size="sm"
+                              >
+                                <option value="">-- Bez loga --</option>
+                                {existingLogos.map((logo) => (
+                                  <option key={logo.id} value={logo.url}>{logo.name}</option>
+                                ))}
+                                <option value="upload_new" className="text-success fw-bold">+ Nahrát nové logo...</option>
+                              </Form.Select>
+                            ) : (
+                              <div className="text-muted small">Nelze měnit strukturu turnaje</div>
+                            )}
+                          </div>
+                        </div>
+
+                        {canEditStructure && uploadModeTeams[index] && (
+                          <div className="border p-3 rounded bg-white mb-2" style={{ borderStyle: "dashed" }}>
+                            <h6>Nahrát nové logo do databáze</h6>
+                            <Form.Group className="mb-2">
+                              <Form.Label className="small mb-1">Název loga</Form.Label>
+                              <Form.Control
+                                type="text"
+                                size="sm"
+                                value={newLogoNames[index] || ""}
+                                onChange={(e) => setNewLogoNames(prev => ({ ...prev, [index]: e.target.value }))}
+                                placeholder="např. AC Sparta Praha"
+                              />
+                            </Form.Group>
+                            <Form.Group className="mb-2">
+                              <Form.Label className="small mb-1">Obrázek (PNG, JPG, SVG)</Form.Label>
+                              <Form.Control
+                                type="file"
+                                size="sm"
+                                accept="image/*"
+                                onChange={(e) => handleFileChange(index, e.target.files[0])}
+                              />
+                            </Form.Group>
+                            <div className="d-flex justify-content-end">
+                              <Button
+                                variant="outline-secondary"
+                                size="sm"
+                                className="me-2"
+                                onClick={() => setUploadModeTeams(prev => ({ ...prev, [index]: false }))}
+                                disabled={uploadingTeams[index]}
+                              >
+                                Zrušit
+                              </Button>
+                              <Button
+                                variant="success"
+                                size="sm"
+                                onClick={() => handleUploadLogo(index)}
+                                disabled={uploadingTeams[index]}
+                              >
+                                {uploadingTeams[index] ? "Nahrávání..." : "Nahrát a přiřadit"}
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                       </Col>
                     </Row>
 

@@ -16,7 +16,7 @@ const ResultsTableHeaders = (props) => {
           {props.currTournament.rounds.map((round, index) => {
             return (<th key={round.date}>{index + 1}. kolo</th>)
           })}
-          <th key="C">Celkem</th>
+          <th key="C" className="text-center">Celkem</th>
         </tr>
       </thead>
     </>
@@ -68,7 +68,7 @@ const ResultsTableRow = (props) => {
             </Button>
           </td></React.Fragment>)
         })}
-        <th key="DRTR" className="vertcenter">{props.dataRow.totalScore}/{props.dataRow.totalNetto}</th>
+        <th key="DRTR" className="vertcenter text-center">{props.dataRow.totalScore}/{props.dataRow.totalNetto}</th>
       </tr>
       <ScorecardModal showScorecard={showScorecard} scorecardId={scorecardId} handleClose={handleClose} />
     </>
@@ -149,7 +149,7 @@ const TeamResultsTableHeaders = (props) => {
           {props.currTournament.rounds.map((round, index) => {
             return (<th key={round.date}>{index + 1}. kolo</th>)
           })}
-          <th key="C">Celkem</th>
+          <th key="C" className="text-center">Celkem</th>
         </tr>
       </thead>
     </>
@@ -158,22 +158,31 @@ const TeamResultsTableHeaders = (props) => {
 
 const getTeamMembers = (team) => {
   let members = team.players.toString();
-  return members.replace(",", " / ").replace(",", " / ")
+  return members.replaceAll(",", " / ");
 }
 
 const TeamResultsTableRow = (props) => {
   return (
     <>
       <tr key={props.counter}>
-        <th key="DRI">{props.counter + 1}</th>
-        <td key="DRT" className="leftrow">{props.dataRow.team.name}</td>
-        <td key="DRP" className="leftrow">{getTeamMembers(props.dataRow.team)}</td>
+        <th key="DRI" className="align-middle">{props.counter + 1}</th>
+        <td key="DRT" className="leftrow align-middle">
+          {props.dataRow.team.logoUrl && (
+            <img 
+              src={props.dataRow.team.logoUrl} 
+              alt={`Logo ${props.dataRow.team.name}`} 
+              style={{ width: "48px", height: "48px", marginRight: "8px", objectFit: "contain", verticalAlign: "middle" }} 
+            />
+          )}
+          <span style={{ verticalAlign: "middle", fontWeight: "bold" }}>{props.dataRow.team.name}</span>
+        </td>
+        <td key="DRP" className="leftrow align-middle">{getTeamMembers(props.dataRow.team)}</td>
         {props.currTournament.rounds.map((round, index) => {
-          return (<React.Fragment key={"R" + round.date + props.counter}><td key={"R" + round.date + props.counter + "_td"}>
+          return (<React.Fragment key={"R" + round.date + props.counter}><td key={"R" + round.date + props.counter + "_td"} className="align-middle">
             {props.dataRow[round.date + "_netto"]}
           </td></React.Fragment>)
         })}
-        <th key="DRTR">{props.dataRow.totalNetto}</th>
+        <th key="DRTR" className="align-middle text-center">{props.dataRow.totalNetto}</th>
       </tr>
     </>
   )

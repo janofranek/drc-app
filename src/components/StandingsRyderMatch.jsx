@@ -73,24 +73,40 @@ const HeaderRyderMatchesDay = (props) => {
 
   const dayStandings = getRyderStandings(props.matches, props.round.date, props.round.date);
   const allMatchesFinal = (props.matches.filter(m => (m.id.substring(0, 10) === props.round.date && !m.final)).length === 0)
+  const totalRows = allMatchesFinal ? 1 : 2;
 
   return (
-    <table className="ryder-score-table">
-      <tbody>
-        <tr>
-          <td rowSpan={2}>{props.round.date}</td>
-          <td><div className="ryder-score-total-small stt-final">{formatRyderStatus(dayStandings.sttFinal)}</div></td>
-          <td><div className="ryder-score-total-small lat-final">{formatRyderStatus(dayStandings.latFinal)}</div></td>
-          <td></td>
-        </tr>
-        {!allMatchesFinal &&
+    <div className="ryder-score-table">
+      <table style={{ border: "none", borderCollapse: "collapse" }}>
+        <tbody>
           <tr>
-            <td><div className="ryder-score-total-small stt-prelim">{formatRyderStatus(dayStandings.sttPrelim)}</div></td>
-            <td><div className="ryder-score-total-small lat-prelim">{formatRyderStatus(dayStandings.latPrelim)}</div></td>
+            <td rowSpan={totalRows} style={{ paddingRight: "16px", verticalAlign: "middle", border: "none" }}>{props.round.date}</td>
+            <td rowSpan={totalRows} style={{ padding: "0 8px", verticalAlign: "middle", border: "none" }}>
+              <img src={logoStt} alt="STT" style={{ width: "48px", height: "48px", objectFit: "contain" }} />
+            </td>
+            <td style={{ padding: "4px 8px", verticalAlign: "middle", border: "none" }}>
+              <div className="ryder-score-total-small stt-final">{formatRyderStatus(dayStandings.sttFinal)}</div>
+            </td>
+            <td style={{ padding: "4px 8px", verticalAlign: "middle", border: "none" }}>
+              <div className="ryder-score-total-small lat-final">{formatRyderStatus(dayStandings.latFinal)}</div>
+            </td>
+            <td rowSpan={totalRows} style={{ padding: "0 8px", verticalAlign: "middle", border: "none" }}>
+              <img src={logoLat} alt="LAT" style={{ width: "48px", height: "48px", objectFit: "contain" }} />
+            </td>
           </tr>
-        }
-      </tbody>
-    </table>
+          {!allMatchesFinal &&
+            <tr>
+              <td style={{ padding: "4px 8px", verticalAlign: "middle", border: "none" }}>
+                <div className="ryder-score-total-small stt-prelim">{formatRyderStatus(dayStandings.sttPrelim)}</div>
+              </td>
+              <td style={{ padding: "4px 8px", verticalAlign: "middle", border: "none" }}>
+                <div className="ryder-score-total-small lat-prelim">{formatRyderStatus(dayStandings.latPrelim)}</div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   )
 }
 
@@ -106,10 +122,16 @@ const RyderMatchStandingsDay = (props) => {
     <Table striped bordered hover size="sm">
       <thead>
         <tr>
-          <th>STT</th>
-          <th>LAT</th>
-          <th>Hotovo</th>
-          <th>Stav</th>
+          <th style={{ textAlign: "left" }}>
+            <img src={logoStt} alt="STT" style={{ width: "24px", height: "24px", marginRight: "8px", objectFit: "contain", verticalAlign: "middle" }} />
+            <span style={{ verticalAlign: "middle" }}>STT</span>
+          </th>
+          <th style={{ textAlign: "left" }}>
+            <img src={logoLat} alt="LAT" style={{ width: "24px", height: "24px", marginRight: "8px", objectFit: "contain", verticalAlign: "middle" }} />
+            <span style={{ verticalAlign: "middle" }}>LAT</span>
+          </th>
+          <th className="text-center">Hotovo</th>
+          <th className="text-center">Stav</th>
         </tr>
       </thead>
       <tbody>
@@ -293,10 +315,16 @@ export const RyderMatchStandingsDetail = (props) => {
       <Table striped bordered hover size="sm">
         <thead>
           <tr>
-            <th>Id</th>
-            <th>STT</th>
-            <th>LAT</th>
-            <th>Stav</th>
+            <th className="text-center">Id</th>
+            <th style={{ textAlign: "left" }}>
+              <img src={logoStt} alt="STT" style={{ width: "24px", height: "24px", marginRight: "8px", objectFit: "contain", verticalAlign: "middle" }} />
+              <span style={{ verticalAlign: "middle" }}>STT</span>
+            </th>
+            <th style={{ textAlign: "left" }}>
+              <img src={logoLat} alt="LAT" style={{ width: "24px", height: "24px", marginRight: "8px", objectFit: "contain", verticalAlign: "middle" }} />
+              <span style={{ verticalAlign: "middle" }}>LAT</span>
+            </th>
+            <th className="text-center">Stav</th>
           </tr>
         </thead>
         <tbody>
